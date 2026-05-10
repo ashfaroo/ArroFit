@@ -449,6 +449,7 @@ JSON format:
     "decisionRelease": "Dec / Late March",
     "admissionsUrl": "https://admissions.school.edu",
     "campusSearchQuery": "School Name campus",
+    "campusImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/...",
     "why": "1-2 sentences why this fits the student",
     "tags": ["tag1","tag2"],
     "aidNote": ""
@@ -543,34 +544,25 @@ function renderResults(result){
   });
   document.getElementById('school-list').innerHTML=html;
   // Load campus images from Wikipedia for each school
-  result.schools.forEach((s,i) => {
+  result.schools.forEach((s) => {
     const tier = s.tier;
     const id = 'sc-' + tier + '-' + result.schools.filter(x=>x.tier===tier).indexOf(s);
-    loadCampusImage(s.name, id);
+    loadCampusImage(s, id);
   });
   document.getElementById('quick-asks').innerHTML=(result.quickAsks||[]).map(q=>`<button class="quick-ask-btn" onclick="setFollowup('${q.replace(/'/g,"\\'")}')">${q}</button>`).join('');
 }
 
-async function loadCampusImage(schoolName, id) {
-  try {
-    const query = encodeURIComponent(schoolName);
-    const url = 'https://en.wikipedia.org/w/api.php?action=query&titles=' + query + '&prop=pageimages&format=json&pithumbsize=800&origin=*';
-    const res = await fetch(url);
-    const data = await res.json();
-    const pages = data.query.pages;
-    const page = pages[Object.keys(pages)[0]];
-    if (page && page.thumbnail && page.thumbnail.source) {
-      const img = document.getElementById('banner-' + id);
-      const placeholder = document.getElementById('placeholder-' + id);
-      if (img) {
-        img.src = page.thumbnail.source;
-        img.onload = () => {
-          img.style.opacity = '1';
-          if (placeholder) placeholder.style.display = 'none';
-        };
-      }
-    }
-  } catch(e) { /* silently fail, placeholder stays */ }
+function loadCampusImage(school, id) {
+  if (!school.campusImageUrl) return;
+  const img = document.getElementById('banner-' + id);
+  const placeholder = document.getElementById('placeholder-' + id);
+  if (!img) return;
+  img.src = school.campusImageUrl;
+  img.onload = () => {
+    img.style.opacity = '1';
+    if (placeholder) placeholder.style.display = 'none';
+  };
+  img.onerror = () => { /* keep initials placeholder */ };
 }
 
 function removeSchool(id){const el=document.getElementById(id);if(!el)return;el.classList.toggle('removed');const btn=document.getElementById('rm-'+id);if(btn)btn.textContent=el.classList.contains('removed')?'Restore':'Remove';}
