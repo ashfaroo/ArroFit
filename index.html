@@ -477,7 +477,7 @@ async function generateList(){
   let si=0;
   const iv=setInterval(()=>{si++;if(si<4)document.getElementById('step'+(si+1)).classList.add('active');},5000);
   try{
-    const res=await fetch('/.netlify/functions/claude-proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:5000,messages:[{role:'user',content:buildPrompt()}]})});
+    const res=await fetch('/.netlify/functions/claude-proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:3000,messages:[{role:'user',content:buildPrompt()}]})});
     clearInterval(iv);
     const data=await res.json();
     if(data.error) throw new Error(data.error.message||JSON.stringify(data.error));
