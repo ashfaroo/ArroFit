@@ -4,205 +4,301 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pathfinder — Your College List, Built for You</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --navy: #0f1b2d;
-    --navy-mid: #1a2e47;
-    --navy-light: #243d5c;
-    --cream: #f7f3ee;
-    --cream-dark: #ede7de;
-    --gold: #c8a96e;
-    --gold-light: #e8d5b0;
-    --green: #2d6a4f;
-    --green-light: #d8f3dc;
-    --amber: #e07b39;
-    --amber-light: #fde8d8;
-    --rose: #c1444b;
-    --rose-light: #fde8e9;
-    --blue: #2563eb;
-    --blue-light: #dbeafe;
-    --text: #1a1a2e;
-    --text-muted: #5a6275;
-    --border: rgba(15,27,45,0.12);
-    --shadow: 0 4px 24px rgba(15,27,45,0.08);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; line-height: 1.6; }
+:root {
+  --ink: #0d0d0d; --ink2: #1c1c1c; --ink3: #2e2e2e;
+  --sand: #f5f0e8; --sand2: #ede6d9; --sand3: #e2d9c8;
+  --gold: #b8974a; --gold2: #d4b06a; --gold3: #f0d090;
+  --white: #fefcf8;
+  --reach: #c1444b; --reach-bg: #fdf0f0;
+  --match: #c47a2a; --match-bg: #fdf5ec;
+  --safety: #2a7a4a; --safety-bg: #edf8f2;
+  --border: rgba(13,13,13,0.1);
+  --shadow: 0 4px 32px rgba(13,13,13,0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: var(--white); color: var(--ink); line-height: 1.6; overflow-x: hidden; }
 
-  header { background: var(--navy); padding: 0 32px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-  .logo { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--cream); letter-spacing: -0.3px; cursor: pointer; }
-  .logo span { color: var(--gold); font-style: italic; }
-  .header-right { display: flex; align-items: center; gap: 12px; }
-  .header-tag { font-size: 12px; color: rgba(247,243,238,0.5); letter-spacing: 0.08em; text-transform: uppercase; }
-  .btn-home { background: rgba(247,243,238,0.1); border: 1px solid rgba(247,243,238,0.2); border-radius: 7px; padding: 7px 16px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(247,243,238,0.8); cursor: pointer; transition: all 0.2s; display: none; }
-  .btn-home:hover { background: rgba(247,243,238,0.18); color: var(--cream); }
+header { position: fixed; top: 0; left: 0; right: 0; z-index: 200; height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; background: rgba(13,13,13,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.06); }
+.logo { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--white); cursor: pointer; letter-spacing: -0.3px; }
+.logo em { color: var(--gold2); font-style: italic; }
+.header-right { display: flex; align-items: center; gap: 16px; }
+.nav-link { font-size: 13px; color: rgba(255,255,255,0.5); cursor: pointer; transition: color 0.2s; background: none; border: none; font-family: 'Inter', sans-serif; }
+.nav-link:hover { color: rgba(255,255,255,0.9); }
+.btn-home { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 7px 18px; font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,0.8); cursor: pointer; transition: all 0.2s; display: none; }
+.btn-home:hover { background: rgba(255,255,255,0.14); color: white; }
+.btn-start-nav { background: var(--gold); border: none; border-radius: 6px; padding: 8px 20px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: var(--ink); cursor: pointer; transition: all 0.2s; }
+.btn-start-nav:hover { background: var(--gold2); }
 
-  .hero { background: var(--navy); padding: 64px 32px 80px; text-align: center; position: relative; overflow: hidden; }
-  .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 60% 0%, rgba(200,169,110,0.15) 0%, transparent 60%), radial-gradient(ellipse at 20% 100%, rgba(37,99,235,0.1) 0%, transparent 50%); pointer-events: none; }
-  .hero-eyebrow { display: inline-block; background: rgba(200,169,110,0.15); border: 1px solid rgba(200,169,110,0.3); color: var(--gold); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; margin-bottom: 20px; }
-  .hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(32px, 5vw, 52px); color: var(--cream); line-height: 1.15; max-width: 680px; margin: 0 auto 16px; letter-spacing: -0.5px; }
-  .hero h1 em { color: var(--gold); font-style: italic; }
-  .hero p { color: rgba(247,243,238,0.65); font-size: 16px; max-width: 480px; margin: 0 auto 32px; font-weight: 300; }
-  .start-btn { background: var(--gold); color: var(--navy); border: none; padding: 14px 32px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; letter-spacing: 0.01em; }
-  .start-btn:hover { background: #d4b87a; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(200,169,110,0.3); }
-  .hero-stats { display: flex; justify-content: center; gap: 48px; margin-top: 48px; padding-top: 32px; border-top: 1px solid rgba(247,243,238,0.08); }
-  .hero-stat { text-align: center; }
-  .hero-stat .num { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--gold); }
-  .hero-stat .lbl { font-size: 12px; color: rgba(247,243,238,0.45); margin-top: 2px; }
+#logo-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.float-logo { position: absolute; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(184,151,74,0.18); border: 1px solid rgba(184,151,74,0.12); border-radius: 6px; padding: 5px 10px; white-space: nowrap; animation: floatUp linear infinite; }
+@keyframes floatUp { 0% { transform: translateY(100vh) rotate(-2deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-120px) rotate(2deg); opacity: 0; } }
 
-  main { max-width: 820px; margin: 0 auto; padding: 48px 24px 80px; }
-  #chat-section { display: none; }
-  #results-section { display: none; }
+#hero-section { position: relative; z-index: 2; }
+.hero-main { min-height: 100vh; background: var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 32px 80px; position: relative; overflow: hidden; }
+.hero-main::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 30%, rgba(184,151,74,0.12) 0%, transparent 65%); pointer-events: none; }
+.hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(184,151,74,0.12); border: 1px solid rgba(184,151,74,0.25); color: var(--gold2); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; padding: 6px 16px; border-radius: 20px; margin-bottom: 28px; font-weight: 500; }
+.hero-eyebrow::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gold2); animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+.hero-h1 { font-family: 'Playfair Display', serif; font-size: clamp(42px,7vw,80px); color: var(--white); line-height: 1.08; max-width: 820px; margin: 0 auto 24px; letter-spacing: -1px; }
+.hero-h1 em { color: var(--gold2); font-style: italic; }
+.hero-sub { font-size: 18px; color: rgba(255,255,255,0.55); max-width: 520px; margin: 0 auto 48px; font-weight: 300; line-height: 1.7; }
+.hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.btn-primary { background: var(--gold); color: var(--ink); border: none; padding: 16px 36px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-primary:hover { background: var(--gold2); transform: translateY(-2px); box-shadow: 0 12px 32px rgba(184,151,74,0.3); }
+.btn-secondary { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.15); padding: 16px 32px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 15px; cursor: pointer; transition: all 0.2s; }
+.btn-secondary:hover { background: rgba(255,255,255,0.1); }
 
-  .progress-bar-wrap { background: var(--cream-dark); border-radius: 4px; height: 4px; margin-bottom: 32px; overflow: hidden; }
-  .progress-bar-fill { height: 100%; background: var(--gold); border-radius: 4px; transition: width 0.5s ease; }
-  .progress-label { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: flex; justify-content: space-between; }
+.stats-strip { background: var(--ink2); border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 32px 40px; display: flex; justify-content: center; gap: 0; position: relative; z-index: 2; }
+.stat-item { text-align: center; padding: 0 48px; border-right: 1px solid rgba(255,255,255,0.08); }
+.stat-item:last-child { border-right: none; }
+.stat-num { font-family: 'Playfair Display', serif; font-size: 36px; color: var(--gold2); font-weight: 600; }
+.stat-lbl { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px; letter-spacing: 0.06em; text-transform: uppercase; }
 
-  .q-card { background: white; border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin-bottom: 20px; box-shadow: var(--shadow); animation: slideUp 0.35s ease; }
-  @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-  .q-group-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 10px; }
-  .q-text { font-size: 18px; font-weight: 500; color: var(--navy); margin-bottom: 6px; line-height: 1.4; }
-  .q-hint { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+.how-section { background: var(--white); padding: 100px 40px; position: relative; z-index: 2; }
+.section-eyebrow { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 14px; text-align: center; }
+.section-title { font-family: 'Playfair Display', serif; font-size: clamp(28px,4vw,44px); color: var(--ink); text-align: center; margin-bottom: 16px; line-height: 1.2; letter-spacing: -0.5px; }
+.section-sub { font-size: 16px; color: #666; text-align: center; max-width: 500px; margin: 0 auto 64px; font-weight: 300; }
+.steps-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 32px; max-width: 960px; margin: 0 auto; }
+.step-card { background: var(--sand); border-radius: 16px; padding: 32px 28px; }
+.step-num { font-family: 'Playfair Display', serif; font-size: 56px; color: rgba(184,151,74,0.2); font-weight: 700; line-height: 1; margin-bottom: 16px; }
+.step-title { font-size: 17px; font-weight: 600; color: var(--ink); margin-bottom: 10px; }
+.step-desc { font-size: 14px; color: #666; line-height: 1.7; }
 
-  .q-input { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 14px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); background: var(--cream); transition: border-color 0.2s; outline: none; }
-  .q-input:focus { border-color: var(--gold); background: white; }
-  .q-select { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 14px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); background: var(--cream); appearance: none; cursor: pointer; outline: none; }
-  .q-select:focus { border-color: var(--gold); background: white; }
+.features-section { background: var(--ink); padding: 100px 40px; position: relative; z-index: 2; }
+.features-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 2px; max-width: 960px; margin: 64px auto 0; }
+.feature-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); padding: 32px; transition: background 0.2s; }
+.feature-item:hover { background: rgba(255,255,255,0.05); }
+.feature-icon { font-size: 28px; margin-bottom: 14px; }
+.feature-title { font-size: 16px; font-weight: 600; color: var(--white); margin-bottom: 8px; }
+.feature-desc { font-size: 14px; color: rgba(255,255,255,0.45); line-height: 1.7; }
+.features-section .section-title { color: var(--white); }
+.features-section .section-sub { color: rgba(255,255,255,0.45); }
 
-  .chip-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
-  .chip { padding: 8px 16px; border-radius: 24px; border: 1.5px solid var(--border); background: var(--cream); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; color: var(--text); user-select: none; }
-  .chip:hover { border-color: var(--gold); background: white; }
-  .chip.selected { background: var(--navy); color: var(--cream); border-color: var(--navy); }
+.mission-section { background: var(--sand); padding: 100px 40px; position: relative; z-index: 2; }
+.mission-inner { max-width: 760px; margin: 0 auto; text-align: center; }
+.mission-quote { font-family: 'Playfair Display', serif; font-size: clamp(22px,3vw,34px); color: var(--ink); line-height: 1.5; margin-bottom: 32px; font-style: italic; letter-spacing: -0.3px; }
+.mission-quote em { color: var(--gold); font-style: normal; }
+.mission-body { font-size: 16px; color: #555; line-height: 1.9; font-weight: 300; max-width: 600px; margin: 0 auto 40px; }
+.mission-sig { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--gold); font-style: italic; }
 
-  .q-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; }
-  .btn-back { background: none; border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 20px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
-  .btn-back:hover { border-color: var(--navy); color: var(--navy); }
-  .btn-next { background: var(--navy); border: none; border-radius: 8px; padding: 11px 28px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: var(--cream); cursor: pointer; transition: all 0.2s; }
-  .btn-next:hover { background: var(--navy-light); }
+.cta-section { background: var(--ink); padding: 100px 40px; text-align: center; position: relative; z-index: 2; overflow: hidden; }
+.cta-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, rgba(184,151,74,0.1) 0%, transparent 65%); pointer-events: none; }
+.cta-section .section-title { color: var(--white); }
+.cta-section .section-sub { color: rgba(255,255,255,0.45); margin-bottom: 40px; }
 
-  #loading-section { display: none; text-align: center; padding: 80px 24px; }
-  .loader-ring { width: 56px; height: 56px; border: 3px solid var(--cream-dark); border-top-color: var(--gold); border-radius: 50%; margin: 0 auto 24px; animation: spin 0.9s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .loader-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--navy); margin-bottom: 8px; }
-  .loader-sub { font-size: 14px; color: var(--text-muted); }
-  .loader-steps { margin-top: 32px; display: flex; flex-direction: column; gap: 10px; max-width: 300px; margin-left: auto; margin-right: auto; }
-  .loader-step { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-muted); opacity: 0.3; transition: opacity 0.5s; }
-  .loader-step.active { opacity: 1; color: var(--navy); }
-  .loader-step .step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cream-dark); flex-shrink: 0; }
-  .loader-step.active .step-dot { background: var(--gold); }
+footer { background: #080808; padding: 32px 40px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 2; }
+.footer-logo { font-family: 'Playfair Display', serif; font-size: 18px; color: rgba(255,255,255,0.4); }
+.footer-logo em { color: var(--gold); font-style: italic; }
+.footer-note { font-size: 12px; color: rgba(255,255,255,0.2); }
 
-  .results-header { background: var(--navy); border-radius: 16px; padding: 28px 32px; margin-bottom: 28px; color: var(--cream); }
-  .results-header h2 { font-family: 'DM Serif Display', serif; font-size: 24px; margin-bottom: 6px; }
-  .results-header p { font-size: 14px; color: rgba(247,243,238,0.6); }
-  .profile-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
-  .profile-pill { background: rgba(247,243,238,0.1); border: 1px solid rgba(247,243,238,0.15); border-radius: 20px; padding: 4px 12px; font-size: 12px; color: rgba(247,243,238,0.8); }
+main { max-width: 820px; margin: 0 auto; padding: 100px 24px 80px; position: relative; z-index: 10; }
+#chat-section { display: none; }
+#results-section { display: none; }
 
-  .tier-section { margin-bottom: 32px; }
-  .tier-label { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-  .tier-badge { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
-  .tier-badge.reach { background: var(--rose-light); color: var(--rose); }
-  .tier-badge.match { background: var(--amber-light); color: var(--amber); }
-  .tier-badge.safety { background: var(--green-light); color: var(--green); }
-  .tier-count { font-size: 13px; color: var(--text-muted); }
+.progress-wrap { margin-bottom: 36px; }
+.progress-label { font-size: 12px; color: #999; margin-bottom: 8px; display: flex; justify-content: space-between; }
+.progress-bar-bg { background: var(--sand2); border-radius: 4px; height: 3px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: var(--gold); border-radius: 4px; transition: width 0.5s ease; }
 
-  .school-card { background: white; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 14px; box-shadow: 0 2px 12px rgba(15,27,45,0.05); transition: box-shadow 0.2s; animation: slideUp 0.3s ease; }
-  .school-card:hover { box-shadow: 0 4px 20px rgba(15,27,45,0.1); }
-  .school-card.removed { opacity: 0.4; border-style: dashed; }
+.q-card { background: white; border: 1px solid var(--border); border-radius: 16px; padding: 36px; margin-bottom: 20px; box-shadow: var(--shadow); animation: slideUp 0.3s ease; }
+@keyframes slideUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+.q-group { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 10px; }
+.q-text { font-size: 20px; font-weight: 600; color: var(--ink); margin-bottom: 6px; line-height: 1.35; }
+.q-hint { font-size: 13px; color: #888; margin-bottom: 22px; }
+.q-input { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 13px 15px; font-family: 'Inter', sans-serif; font-size: 15px; color: var(--ink); background: var(--sand); outline: none; transition: border-color 0.2s; }
+.q-input:focus { border-color: var(--gold); background: white; }
+.q-select { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 13px 15px; font-family: 'Inter', sans-serif; font-size: 15px; color: var(--ink); background: var(--sand); appearance: none; cursor: pointer; outline: none; }
+.q-select:focus { border-color: var(--gold); background: white; }
+.chip-group { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 4px; }
+.chip { padding: 9px 18px; border-radius: 24px; border: 1.5px solid var(--border); background: var(--sand); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; color: var(--ink); user-select: none; }
+.chip:hover { border-color: var(--gold); background: white; }
+.chip.selected { background: var(--ink); color: white; border-color: var(--ink); }
+.q-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; }
+.btn-back { background: none; border: 1.5px solid var(--border); border-radius: 8px; padding: 11px 22px; font-family: 'Inter', sans-serif; font-size: 14px; color: #888; cursor: pointer; transition: all 0.2s; }
+.btn-back:hover { border-color: var(--ink); color: var(--ink); }
+.btn-next { background: var(--ink); border: none; border-radius: 8px; padding: 12px 30px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: white; cursor: pointer; transition: all 0.2s; }
+.btn-next:hover { background: var(--ink3); }
+.btn-generate { background: var(--gold) !important; color: var(--ink) !important; }
+.btn-generate:hover { background: var(--gold2) !important; }
 
-  .school-campus-img { width: 100%; height: 160px; object-fit: cover; display: block; background: var(--cream-dark); }
-  .school-campus-placeholder { width: 100%; height: 120px; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; }
-  .school-campus-placeholder span { font-family: 'DM Serif Display', serif; font-size: 28px; color: rgba(247,243,238,0.15); letter-spacing: 2px; }
+#loading-section { display: none; text-align: center; padding: 80px 24px; }
+.loader-ring { width: 52px; height: 52px; border: 3px solid var(--sand2); border-top-color: var(--gold); border-radius: 50%; margin: 0 auto 24px; animation: spin 0.9s linear infinite; }
+@keyframes spin { to{transform:rotate(360deg)} }
+.loader-title { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--ink); margin-bottom: 8px; }
+.loader-sub { font-size: 14px; color: #888; }
+.loader-steps { margin: 36px auto 0; display: flex; flex-direction: column; gap: 12px; max-width: 280px; }
+.loader-step { display: flex; align-items: center; gap: 12px; font-size: 13px; color: #aaa; opacity: 0.3; transition: opacity 0.5s; }
+.loader-step.active { opacity: 1; color: var(--ink); }
+.loader-step .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sand2); flex-shrink: 0; }
+.loader-step.active .dot { background: var(--gold); }
 
-  .school-body { padding: 20px 22px; }
-  .school-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-  .school-name { font-size: 17px; font-weight: 600; color: var(--navy); }
-  .school-location { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
-  .school-actions { display: flex; gap: 6px; flex-shrink: 0; }
-  .btn-remove, .btn-campus, .btn-ask { border: 1.5px solid var(--border); border-radius: 7px; padding: 6px 12px; font-size: 12px; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.15s; background: none; white-space: nowrap; }
-  .btn-remove { color: var(--rose); }
-  .btn-remove:hover { background: var(--rose-light); border-color: var(--rose); }
-  .btn-campus { color: var(--navy); }
-  .btn-campus:hover { background: var(--blue-light); border-color: var(--blue); }
-  .btn-ask { color: var(--navy); }
-  .btn-ask:hover { background: var(--cream); border-color: var(--navy); }
+.results-header { background: var(--ink); border-radius: 16px; padding: 30px 34px; margin-bottom: 28px; color: white; }
+.results-header h2 { font-family: 'Playfair Display', serif; font-size: 26px; margin-bottom: 6px; }
+.results-header p { font-size: 14px; color: rgba(255,255,255,0.55); }
+.profile-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.profile-pill { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 4px 12px; font-size: 12px; color: rgba(255,255,255,0.75); }
 
-  .school-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0; }
-  .school-stat { background: var(--cream); border-radius: 8px; padding: 10px 12px; text-align: center; }
-  .school-stat .stat-val { font-size: 15px; font-weight: 600; color: var(--navy); }
-  .school-stat .stat-lbl { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.tier-section { margin-bottom: 36px; }
+.tier-label { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.tier-badge { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; padding: 4px 12px; border-radius: 20px; }
+.tier-badge.reach { background: var(--reach-bg); color: var(--reach); }
+.tier-badge.match { background: var(--match-bg); color: var(--match); }
+.tier-badge.safety { background: var(--safety-bg); color: var(--safety); }
+.tier-count { font-size: 13px; color: #888; }
 
-  .school-dates { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-  .school-date { background: var(--cream); border-radius: 8px; padding: 10px 12px; }
-  .school-date .date-lbl { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.06em; }
-  .school-date .date-val { font-size: 13px; font-weight: 500; color: var(--navy); }
+.school-card { background: white; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 2px 16px rgba(13,13,13,0.05); transition: box-shadow 0.2s, transform 0.2s; animation: slideUp 0.3s ease; }
+.school-card:hover { box-shadow: 0 8px 32px rgba(13,13,13,0.1); transform: translateY(-1px); }
+.school-card.removed { opacity: 0.35; border-style: dashed; transform: none; }
 
-  .school-why { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 12px; padding-left: 12px; border-left: 3px solid var(--gold-light); }
-  .school-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-  .school-tag { background: var(--cream); border: 1px solid var(--border); border-radius: 20px; padding: 3px 10px; font-size: 11px; color: var(--text-muted); }
+.school-banner-placeholder { width: 100%; height: 180px; background: linear-gradient(135deg, var(--ink) 0%, var(--ink3) 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: opacity 0.2s; text-decoration: none; }
+.school-banner-placeholder:hover { opacity: 0.82; }
+.school-banner-initials { font-family: 'Playfair Display', serif; font-size: 40px; color: rgba(255,255,255,0.12); letter-spacing: 4px; }
+.school-banner-hint { font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; }
 
-  .results-actions { background: white; border: 1px solid var(--border); border-radius: 14px; padding: 20px 24px; margin-top: 28px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
-  .results-actions p { font-size: 14px; color: var(--text-muted); flex: 1; min-width: 200px; }
-  .btn-action { border: 1.5px solid var(--border); border-radius: 8px; padding: 9px 18px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; background: none; color: var(--navy); }
-  .btn-action:hover { background: var(--cream); border-color: var(--navy); }
-  .btn-action.primary { background: var(--navy); color: var(--cream); border-color: var(--navy); }
-  .btn-action.primary:hover { background: var(--navy-light); }
+.school-body { padding: 22px 24px; }
+.school-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; gap: 12px; }
+.school-name { font-size: 18px; font-weight: 700; color: var(--ink); }
+.school-location { font-size: 13px; color: #888; margin-top: 3px; }
+.school-links { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+.btn-sm { border: 1.5px solid var(--border); border-radius: 7px; padding: 6px 13px; font-size: 12px; font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.15s; background: none; white-space: nowrap; font-weight: 500; }
+.btn-sm.campus { color: #555; }
+.btn-sm.campus:hover { background: var(--sand); border-color: #999; }
+.btn-sm.admissions { color: var(--gold); border-color: rgba(184,151,74,0.3); }
+.btn-sm.admissions:hover { background: rgba(184,151,74,0.08); border-color: var(--gold); }
+.btn-sm.ask { color: var(--ink); }
+.btn-sm.ask:hover { background: var(--sand); border-color: var(--ink); }
+.btn-sm.remove { color: var(--reach); }
+.btn-sm.remove:hover { background: var(--reach-bg); border-color: var(--reach); }
 
-  .followup-section { background: white; border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-top: 20px; }
-  .followup-section h3 { font-size: 15px; font-weight: 600; color: var(--navy); margin-bottom: 14px; }
-  .followup-input-wrap { display: flex; gap: 10px; }
-  .followup-input { flex: 1; border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; background: var(--cream); }
-  .followup-input:focus { border-color: var(--gold); background: white; }
-  .btn-send { background: var(--gold); border: none; border-radius: 10px; padding: 11px 20px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: var(--navy); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
-  .btn-send:hover { background: #d4b87a; }
-  .followup-response { margin-top: 16px; padding: 14px 16px; background: var(--cream); border-radius: 10px; font-size: 14px; line-height: 1.7; color: var(--text); display: none; white-space: pre-wrap; }
-  .followup-response.visible { display: block; animation: slideUp 0.3s ease; }
-  .quick-asks { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-  .quick-ask-btn { background: var(--cream); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 12px; cursor: pointer; transition: all 0.15s; color: var(--text-muted); font-family: 'DM Sans', sans-serif; }
-  .quick-ask-btn:hover { border-color: var(--gold); color: var(--navy); background: white; }
-  .error-box { background: var(--rose-light); border: 1px solid var(--rose); border-radius: 10px; padding: 14px 18px; font-size: 14px; color: var(--rose); margin-top: 16px; display: none; }
+.school-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin: 14px 0; }
+.s-stat { background: var(--sand); border-radius: 10px; padding: 10px 12px; text-align: center; }
+.s-stat-val { font-size: 14px; font-weight: 700; color: var(--ink); line-height: 1.2; }
+.s-stat-lbl { font-size: 10px; color: #888; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.06em; }
 
-  @media (max-width: 600px) {
-    .hero { padding: 48px 20px 56px; }
-    .hero-stats { gap: 24px; }
-    main { padding: 32px 16px 60px; }
-    .q-card { padding: 22px 18px; }
-    .school-stats { grid-template-columns: repeat(2, 1fr); }
-    .school-actions { flex-wrap: wrap; }
-  }
+.school-why { font-size: 14px; color: #555; line-height: 1.7; margin-bottom: 14px; padding-left: 14px; border-left: 3px solid var(--gold3); }
+.school-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.s-tag { background: var(--sand); border: 1px solid var(--border); border-radius: 20px; padding: 3px 11px; font-size: 11px; color: #777; }
+
+.results-actions { background: white; border: 1px solid var(--border); border-radius: 14px; padding: 22px 26px; margin-top: 28px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.results-actions p { font-size: 14px; color: #888; flex: 1; min-width: 180px; }
+.btn-action { border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 20px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; background: none; color: var(--ink); }
+.btn-action:hover { background: var(--sand); border-color: var(--ink); }
+.btn-action.primary { background: var(--ink); color: white; border-color: var(--ink); }
+.btn-action.primary:hover { background: var(--ink3); }
+
+.followup-section { background: white; border: 1px solid var(--border); border-radius: 14px; padding: 26px; margin-top: 20px; }
+.followup-section h3 { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 14px; }
+.followup-wrap { display: flex; gap: 10px; }
+.followup-input { flex: 1; border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 15px; font-family: 'Inter', sans-serif; font-size: 14px; outline: none; background: var(--sand); transition: all 0.2s; }
+.followup-input:focus { border-color: var(--gold); background: white; }
+.btn-send { background: var(--gold); border: none; border-radius: 10px; padding: 12px 22px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: var(--ink); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.btn-send:hover { background: var(--gold2); }
+.followup-response { margin-top: 16px; padding: 16px 18px; background: var(--sand); border-radius: 10px; font-size: 14px; line-height: 1.75; color: var(--ink); display: none; white-space: pre-wrap; }
+.followup-response.visible { display: block; animation: slideUp 0.3s ease; }
+.quick-asks { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.quick-ask-btn { background: var(--sand); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 12px; cursor: pointer; transition: all 0.15s; color: #777; font-family: 'Inter', sans-serif; }
+.quick-ask-btn:hover { border-color: var(--gold); color: var(--ink); background: white; }
+.error-box { background: var(--reach-bg); border: 1px solid var(--reach); border-radius: 10px; padding: 12px 16px; font-size: 14px; color: var(--reach); margin-top: 14px; display: none; }
+
+@media(max-width:700px){
+  .steps-grid,.features-grid{grid-template-columns:1fr}
+  .stats-strip{flex-wrap:wrap;gap:24px}
+  .stat-item{border-right:none;padding:0 24px}
+  .school-stats{grid-template-columns:repeat(2,1fr)}
+  header{padding:0 20px}
+  .hero-main{padding:100px 20px 60px}
+  footer{flex-direction:column;gap:8px;text-align:center}
+  .school-links{flex-wrap:wrap}
+}
 </style>
 </head>
 <body>
 
+<div id="logo-canvas"></div>
+
 <header>
-  <div class="logo" onclick="startOver()">Path<span>finder</span></div>
+  <div class="logo" onclick="goHome()">Path<em>finder</em></div>
   <div class="header-right">
-    <div class="header-tag">College List Builder</div>
-    <button class="btn-home" id="btn-home" onclick="startOver()">← Home</button>
+    <button class="nav-link" onclick="document.getElementById('how-section').scrollIntoView({behavior:'smooth'})">How it works</button>
+    <button class="nav-link" onclick="document.getElementById('mission-section').scrollIntoView({behavior:'smooth'})">Our mission</button>
+    <button class="btn-home" id="btn-home" onclick="goHome()">← Home</button>
+    <button class="btn-start-nav" onclick="startChat()">Get started</button>
   </div>
 </header>
 
 <div id="hero-section">
-  <div class="hero">
-    <div class="hero-eyebrow">AI-Powered · Free to Use</div>
-    <h1>Find the colleges <em>right for you</em></h1>
-    <p>Answer a few questions about yourself and we'll build a personalized, tiered college list — reach, match, and safety schools.</p>
-    <button class="start-btn" onclick="startChat()">Build my college list →</button>
-    <div class="hero-stats">
-      <div class="hero-stat"><div class="num">5 min</div><div class="lbl">to complete</div></div>
-      <div class="hero-stat"><div class="num">10–20</div><div class="lbl">tailored schools</div></div>
-      <div class="hero-stat"><div class="num">100%</div><div class="lbl">personalized</div></div>
+  <div class="hero-main">
+    <div class="hero-eyebrow">AI-Powered College Advising</div>
+    <h1 class="hero-h1">Your perfect college list,<br><em>built around you</em></h1>
+    <p class="hero-sub">Answer a few questions and our AI builds a personalized, tiered college list — complete with stats, deadlines, and fit explanations.</p>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="startChat()">Build my college list →</button>
+      <button class="btn-secondary" onclick="document.getElementById('how-section').scrollIntoView({behavior:'smooth'})">See how it works</button>
     </div>
   </div>
+
+  <div class="stats-strip">
+    <div class="stat-item"><div class="stat-num">5 min</div><div class="stat-lbl">to complete</div></div>
+    <div class="stat-item"><div class="stat-num">10–20</div><div class="stat-lbl">tailored schools</div></div>
+    <div class="stat-item"><div class="stat-num">3 tiers</div><div class="stat-lbl">reach, match, safety</div></div>
+    <div class="stat-item"><div class="stat-num">100%</div><div class="stat-lbl">personalized</div></div>
+  </div>
+
+  <div class="how-section" id="how-section">
+    <div class="section-eyebrow">The process</div>
+    <h2 class="section-title">Simple. Smart. Yours.</h2>
+    <p class="section-sub">Three steps from blank slate to a complete, personalized college list.</p>
+    <div class="steps-grid">
+      <div class="step-card"><div class="step-num">01</div><div class="step-title">Tell us about yourself</div><div class="step-desc">Share your GPA, test scores, extracurriculars, intended major, and what you're looking for in a college. Takes about 5 minutes.</div></div>
+      <div class="step-card"><div class="step-num">02</div><div class="step-title">Our AI builds your list</div><div class="step-desc">Claude — one of the most advanced AI models available — analyzes your profile and generates a tiered list of reach, match, and safety schools.</div></div>
+      <div class="step-card"><div class="step-num">03</div><div class="step-title">Refine and explore</div><div class="step-desc">Remove schools, ask follow-up questions, view campus photos, check deadlines, and jump straight to each school's admissions page.</div></div>
+    </div>
+  </div>
+
+  <div class="features-section">
+    <div class="section-eyebrow" style="color:var(--gold2)">What you get</div>
+    <h2 class="section-title">Everything in one place</h2>
+    <p class="section-sub">No more bouncing between tabs. Every school comes with everything you need.</p>
+    <div class="features-grid">
+      <div class="feature-item"><div class="feature-icon">🎯</div><div class="feature-title">Personalized fit explanations</div><div class="feature-desc">Every school comes with a paragraph explaining exactly why it matches your specific profile, major, and preferences — not generic descriptions.</div></div>
+      <div class="feature-item"><div class="feature-icon">📊</div><div class="feature-title">Acceptance rates & tuition</div><div class="feature-desc">See acceptance rates, estimated tuition based on your program, and enrollment size at a glance for every school on your list.</div></div>
+      <div class="feature-item"><div class="feature-icon">📅</div><div class="feature-title">Application deadlines</div><div class="feature-desc">Early Decision, Early Action, and Regular Decision deadlines — plus when you can expect to hear back — all on the card.</div></div>
+      <div class="feature-item"><div class="feature-icon">🏛️</div><div class="feature-title">Campus photos & admissions links</div><div class="feature-desc">Browse campus imagery and jump straight to each school's official admissions page with one click — no searching required.</div></div>
+      <div class="feature-item"><div class="feature-icon">💬</div><div class="feature-title">Ask follow-up questions</div><div class="feature-desc">Not sure about a school? Ask anything — program details, campus life, or request alternative suggestions tailored to your profile.</div></div>
+      <div class="feature-item"><div class="feature-icon">✏️</div><div class="feature-title">Fully adjustable list</div><div class="feature-desc">Remove schools that don't feel right, request replacements, and tweak preferences until your list feels exactly right for you.</div></div>
+    </div>
+  </div>
+
+  <div class="mission-section" id="mission-section">
+    <div class="mission-inner">
+      <div class="section-eyebrow">Our mission</div>
+      <p class="mission-quote">"Every student deserves the same quality of college advising — regardless of where they go to school or <em>what they can afford.</em>"</p>
+      <p class="mission-body">Private college counselors can cost thousands of dollars. School counselors are often stretched across hundreds of students. The result is that the quality of your college list often depends on your zip code — and that's not fair.<br><br>Pathfinder was built to change that. By combining the knowledge of experienced admissions counselors with the power of modern AI, we give every high school and college student access to the same quality of guidance — personalized, thoughtful, and completely free.<br><br>We believe the right college fit can change the trajectory of your life. We're here to help you find it.</p>
+      <div class="mission-sig">— The Pathfinder Team</div>
+    </div>
+  </div>
+
+  <div class="cta-section">
+    <div class="section-eyebrow" style="color:var(--gold2)">Ready?</div>
+    <h2 class="section-title">Build your list in 5 minutes</h2>
+    <p class="section-sub">Free, instant, and genuinely personalized. No account required.</p>
+    <button class="btn-primary" onclick="startChat()">Get started →</button>
+  </div>
+
+  <footer>
+    <div class="footer-logo">Path<em>finder</em></div>
+    <div class="footer-note">Free to use · Powered by Claude AI · Built for students</div>
+  </footer>
 </div>
 
 <main>
   <div id="chat-section">
-    <div class="progress-label">
-      <span id="progress-text">Step 1 of 21</span>
-      <span id="progress-pct">0%</span>
+    <div class="progress-wrap">
+      <div class="progress-label"><span id="progress-text">Step 1 of 21</span><span id="progress-pct">0%</span></div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" style="width:0%"></div></div>
     </div>
-    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-bar" style="width:0%"></div></div>
     <div id="question-container"></div>
   </div>
 
@@ -211,30 +307,30 @@
     <div class="loader-title">Building your college list…</div>
     <div class="loader-sub">This takes about 15–30 seconds</div>
     <div class="loader-steps">
-      <div class="loader-step active" id="step1"><div class="step-dot"></div>Analyzing your academic profile</div>
-      <div class="loader-step" id="step2"><div class="step-dot"></div>Matching school preferences</div>
-      <div class="loader-step" id="step3"><div class="step-dot"></div>Evaluating financial fit</div>
-      <div class="loader-step" id="step4"><div class="step-dot"></div>Ranking reach, match & safety</div>
+      <div class="loader-step active" id="step1"><div class="dot"></div>Analyzing your academic profile</div>
+      <div class="loader-step" id="step2"><div class="dot"></div>Matching your school preferences</div>
+      <div class="loader-step" id="step3"><div class="dot"></div>Evaluating financial fit</div>
+      <div class="loader-step" id="step4"><div class="dot"></div>Ranking reach, match & safety</div>
     </div>
   </div>
 
   <div id="results-section">
     <div class="results-header">
-      <h2>Your College List</h2>
-      <p id="results-sub">Based on your profile, here are our recommended schools.</p>
+      <h2>Your college list</h2>
+      <p id="results-sub"></p>
       <div class="profile-pills" id="profile-pills"></div>
     </div>
     <div id="school-list"></div>
     <div class="results-actions">
-      <p>Want to refine your list? Remove schools above or ask for alternatives below.</p>
-      <button class="btn-action" onclick="startOver()">← Start over</button>
+      <p>Remove schools above or ask for alternatives below.</p>
+      <button class="btn-action" onclick="goHome()">← Start over</button>
       <button class="btn-action primary" onclick="window.print()">Save / Print list</button>
     </div>
     <div class="followup-section">
       <h3>Ask a follow-up question</h3>
       <div class="quick-asks" id="quick-asks"></div>
-      <div class="followup-input-wrap">
-        <input type="text" class="followup-input" id="followup-input" placeholder="e.g. Tell me more about University of Michigan, or swap out a school for something in the South…" onkeydown="if(event.key==='Enter') sendFollowup()">
+      <div class="followup-wrap">
+        <input type="text" class="followup-input" id="followup-input" placeholder="e.g. Tell me more about UMich, swap a school for somewhere warmer, which has the best financial aid…" onkeydown="if(event.key==='Enter') sendFollowup()">
         <button class="btn-send" onclick="sendFollowup()">Ask →</button>
       </div>
       <div class="followup-response" id="followup-response"></div>
@@ -244,326 +340,249 @@
 </main>
 
 <script>
+const SCHOOL_NAMES = ['MIT','Harvard','Stanford','Yale','Princeton','Columbia','Penn','Dartmouth','Brown','Cornell','Duke','Northwestern','Vanderbilt','Rice','Emory','Georgetown','Tufts','NYU','USC','UCLA','Michigan','UNC','UVA','Georgia Tech','Purdue','Ohio State','Texas A&M','Indiana','Wisconsin','Boston University','Northeastern','Tulane','Wake Forest','Pomona','Harvey Mudd','Swarthmore','Williams','Amherst','Wesleyan','Colgate','Middlebury','Bowdoin','Colby','Hamilton','Oberlin','Kenyon','Grinnell','Davidson','Fordham','Lehigh'];
+
+function spawnLogo() {
+  const canvas = document.getElementById('logo-canvas');
+  if (!canvas || canvas.style.display === 'none') return;
+  const el = document.createElement('div');
+  el.className = 'float-logo';
+  el.textContent = SCHOOL_NAMES[Math.floor(Math.random() * SCHOOL_NAMES.length)];
+  el.style.left = (Math.random() * 92) + '%';
+  const dur = 14 + Math.random() * 14;
+  el.style.animationDuration = dur + 's';
+  document.getElementById('logo-canvas').appendChild(el);
+  setTimeout(() => el.remove(), dur * 1000);
+}
+setInterval(spawnLogo, 1400);
+for (let i = 0; i < 10; i++) setTimeout(spawnLogo, i * 350);
+
 const QUESTIONS = [
-  { group: "Getting Started", key: "student_type", text: "Are you a high school student or a college student looking to transfer?", hint: "This helps us find the right type of programs for you.", type: "chips", options: ["High school student", "Community college student", "4-year transfer student"] },
-  { group: "Getting Started", key: "current_state", text: "What state do you currently live in?", hint: "We'll factor in in-state tuition benefits and proximity.", type: "select", options: ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming","Washington D.C.","Outside the U.S."] },
-  { group: "Academic Profile", key: "gpa", text: "What is your current GPA?", hint: "Enter your unweighted GPA (0.0–4.0 scale). If weighted, mention that in the field.", type: "text", placeholder: "e.g. 3.7 unweighted, 4.2 weighted" },
-  { group: "Academic Profile", key: "test_scores", text: "Do you have SAT or ACT scores?", hint: "Leave blank if you're applying test-optional.", type: "text", placeholder: "e.g. SAT 1340, ACT 29, or 'applying test-optional'" },
-  { group: "Academic Profile", key: "class_rank", text: "Do you know your class rank or percentile?", hint: "Optional — skip if your school doesn't rank.", type: "text", placeholder: "e.g. Top 10%, 15 out of 300, or 'not ranked'" },
-  { group: "Academic Profile", key: "courses", text: "Have you taken any advanced courses?", hint: "AP, IB, dual enrollment, honors — list what applies.", type: "text", placeholder: "e.g. 5 APs, IB diploma, dual enrollment at local college" },
-  { group: "Your Story", key: "extracurriculars", text: "What are your main extracurricular activities?", hint: "Clubs, sports, jobs, volunteering, leadership roles — anything meaningful.", type: "textarea", placeholder: "e.g. Varsity soccer captain, debate team, volunteer at local food bank, part-time job" },
-  { group: "Your Story", key: "achievements", text: "Any notable achievements, awards, or special talents?", hint: "Think competitions, publications, Eagle Scout, arts, research, etc. Skip if not applicable.", type: "text", placeholder: "e.g. National Merit Semifinalist, state science fair winner, or 'none'" },
-  { group: "Academic Interests", key: "major", text: "What do you want to study, or what field are you drawn to?", hint: "Be as specific or general as you'd like.", type: "text", placeholder: "e.g. Computer Science, undecided but interested in business/econ, Pre-med" },
-  { group: "Academic Interests", key: "school_type_pref", text: "What type of school appeals to you?", hint: "Pick all that apply.", type: "chips-multi", options: ["Research university", "Liberal arts college", "Technical/STEM focused", "Business focused", "Art/design school", "No strong preference"] },
-  { group: "The List", key: "num_schools", text: "How many schools would you like on your list?", hint: "We'll split them into reach, match, and safety tiers.", type: "chips", options: ["8–10 schools", "11–15 schools", "16–20 schools"] },
-  { group: "The List", key: "financial_aid", text: "Is financial aid or merit scholarships important to you?", hint: "This helps us prioritize schools with strong aid programs.", type: "chips", options: ["Yes — need-based aid is essential", "Yes — looking for merit scholarships", "Both matter", "Not a primary concern"] },
-  { group: "Campus Preferences", key: "location", text: "Where would you like to go to school?", hint: "Pick all regions you'd consider.", type: "chips-multi", options: ["Northeast", "Southeast", "Midwest", "Southwest", "West Coast", "Mountain West", "Open to anywhere", "Prefer to stay in my state"] },
-  { group: "Campus Preferences", key: "distance", text: "How far from home are you comfortable going?", type: "chips", options: ["Close — within 2 hours", "Moderate — within a day's drive", "Far — anywhere in the U.S.", "No preference"] },
-  { group: "Campus Preferences", key: "climate", text: "Any climate preference?", type: "chips", options: ["Warm / sunny", "Cold / four seasons", "Mild / moderate", "No preference"] },
-  { group: "Campus Preferences", key: "school_size", text: "How large do you want your school to be?", type: "chips", options: ["Small (<3,000 students)", "Medium (3,000–15,000)", "Large (15,000–30,000)", "Very large (30,000+)", "No preference"] },
-  { group: "Campus Preferences", key: "setting", text: "What campus setting do you prefer?", type: "chips", options: ["Urban — big city", "Suburban", "College town / rural", "No preference"] },
-  { group: "Campus Vibe", key: "sports", text: "How important is a strong sports scene?", type: "chips", options: ["Very important — I love big game days", "Somewhat important", "Not important at all"] },
-  { group: "Campus Vibe", key: "greek_life", text: "How do you feel about Greek life?", type: "chips", options: ["Important — I want to rush", "Nice to have but not essential", "Not my thing", "No preference"] },
-  { group: "Campus Vibe", key: "campus_culture", text: "What kind of campus culture fits you best?", hint: "Pick all that resonate.", type: "chips-multi", options: ["Strong research opportunities", "Internship & co-op programs", "Vibrant arts & culture", "Entrepreneurship focus", "Strong sense of community", "Diverse & inclusive environment", "Study abroad opportunities", "Religious community"] },
-  { group: "Campus Vibe", key: "public_private", text: "Public or private school?", type: "chips", options: ["Public", "Private", "No preference"] }
+  {group:"Getting Started",key:"student_type",text:"Are you a high school student or a college student looking to transfer?",hint:"This helps us find the right type of programs for you.",type:"chips",options:["High school student","Community college student","4-year transfer student"]},
+  {group:"Getting Started",key:"current_state",text:"What state do you currently live in?",hint:"We'll factor in in-state tuition benefits and proximity.",type:"select",options:["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming","Washington D.C.","Outside the U.S."]},
+  {group:"Academic Profile",key:"gpa",text:"What is your current GPA?",hint:"Enter your unweighted GPA (0.0–4.0). If weighted, mention that.",type:"text",placeholder:"e.g. 3.7 unweighted, 4.2 weighted"},
+  {group:"Academic Profile",key:"test_scores",text:"Do you have SAT or ACT scores?",hint:"Leave blank if you're applying test-optional.",type:"text",placeholder:"e.g. SAT 1340, ACT 29, or 'applying test-optional'"},
+  {group:"Academic Profile",key:"class_rank",text:"Do you know your class rank or percentile?",hint:"Optional — skip if your school doesn't rank.",type:"text",placeholder:"e.g. Top 10%, 15 out of 300, or 'not ranked'"},
+  {group:"Academic Profile",key:"courses",text:"Have you taken any advanced courses?",hint:"AP, IB, dual enrollment, honors — list what applies.",type:"text",placeholder:"e.g. 5 APs, IB diploma, dual enrollment"},
+  {group:"Your Story",key:"extracurriculars",text:"What are your main extracurricular activities?",hint:"Clubs, sports, jobs, volunteering, leadership — anything meaningful.",type:"textarea",placeholder:"e.g. Varsity soccer captain, debate team, volunteer at food bank, part-time job"},
+  {group:"Your Story",key:"achievements",text:"Any notable achievements, awards, or special talents?",hint:"Competitions, publications, Eagle Scout, research, etc. Skip if not applicable.",type:"text",placeholder:"e.g. National Merit Semifinalist, state science fair winner, or 'none'"},
+  {group:"Academic Interests",key:"major",text:"What do you want to study, or what field are you drawn to?",hint:"Be as specific or general as you'd like.",type:"text",placeholder:"e.g. Computer Science, undecided but interested in business, Pre-med"},
+  {group:"Academic Interests",key:"school_type_pref",text:"What type of school appeals to you?",hint:"Pick all that apply.",type:"chips-multi",options:["Research university","Liberal arts college","Technical/STEM focused","Business focused","Art/design school","No strong preference"]},
+  {group:"The List",key:"num_schools",text:"How many schools would you like on your list?",hint:"We'll split them into reach, match, and safety tiers.",type:"chips",options:["8–10 schools","11–15 schools","16–20 schools"]},
+  {group:"The List",key:"financial_aid",text:"Is financial aid or merit scholarships important to you?",hint:"This helps us prioritize schools with strong aid programs.",type:"chips",options:["Yes — need-based aid is essential","Yes — looking for merit scholarships","Both matter","Not a primary concern"]},
+  {group:"Campus Preferences",key:"location",text:"Where would you like to go to school?",hint:"Pick all regions you'd consider.",type:"chips-multi",options:["Northeast","Southeast","Midwest","Southwest","West Coast","Mountain West","Open to anywhere","Prefer to stay in my state"]},
+  {group:"Campus Preferences",key:"distance",text:"How far from home are you comfortable going?",type:"chips",options:["Close — within 2 hours","Moderate — within a day's drive","Far — anywhere in the U.S.","No preference"]},
+  {group:"Campus Preferences",key:"climate",text:"Any climate preference?",type:"chips",options:["Warm / sunny","Cold / four seasons","Mild / moderate","No preference"]},
+  {group:"Campus Preferences",key:"school_size",text:"How large do you want your school to be?",type:"chips",options:["Small (<3,000 students)","Medium (3,000–15,000)","Large (15,000–30,000)","Very large (30,000+)","No preference"]},
+  {group:"Campus Preferences",key:"setting",text:"What campus setting do you prefer?",type:"chips",options:["Urban — big city","Suburban","College town / rural","No preference"]},
+  {group:"Campus Vibe",key:"sports",text:"How important is a strong sports scene?",type:"chips",options:["Very important — I love big game days","Somewhat important","Not important at all"]},
+  {group:"Campus Vibe",key:"greek_life",text:"How do you feel about Greek life?",type:"chips",options:["Important — I want to rush","Nice to have but not essential","Not my thing","No preference"]},
+  {group:"Campus Vibe",key:"campus_culture",text:"What kind of campus culture fits you best?",hint:"Pick all that resonate.",type:"chips-multi",options:["Strong research opportunities","Internship & co-op programs","Vibrant arts & culture","Entrepreneurship focus","Strong sense of community","Diverse & inclusive environment","Study abroad opportunities","Religious community"]},
+  {group:"Campus Vibe",key:"public_private",text:"Public or private school?",type:"chips",options:["Public","Private","No preference"]}
 ];
 
-let answers = {};
-let currentQ = 0;
-let schoolsData = [];
+let answers={}, currentQ=0, schoolsData=[];
+
+function goHome() {
+  answers={}; currentQ=0; schoolsData=[];
+  ['results-section','loading-section','chat-section'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById('hero-section').style.display='block';
+  document.getElementById('btn-home').style.display='none';
+  document.getElementById('logo-canvas').style.display='block';
+  ['step1','step2','step3','step4'].forEach((s,i)=>{const el=document.getElementById(s);if(el){el.classList.remove('active');if(i===0)el.classList.add('active');}});
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 
 function startChat() {
-  document.getElementById('hero-section').style.display = 'none';
-  document.getElementById('chat-section').style.display = 'block';
-  document.getElementById('btn-home').style.display = 'block';
+  document.getElementById('hero-section').style.display='none';
+  document.getElementById('logo-canvas').style.display='none';
+  document.getElementById('chat-section').style.display='block';
+  document.getElementById('btn-home').style.display='block';
+  window.scrollTo({top:0});
   renderQuestion(0);
 }
 
 function renderQuestion(idx) {
-  const q = QUESTIONS[idx];
-  const total = QUESTIONS.length;
-  const pct = Math.round((idx / total) * 100);
-  document.getElementById('progress-text').textContent = `Step ${idx + 1} of ${total}`;
-  document.getElementById('progress-pct').textContent = pct + '%';
-  document.getElementById('progress-bar').style.width = pct + '%';
-
-  let inputHTML = '';
-  if (q.type === 'text') {
-    inputHTML = `<input class="q-input" id="q-answer" type="text" placeholder="${q.placeholder || ''}" value="${answers[q.key] || ''}">`;
-  } else if (q.type === 'textarea') {
-    inputHTML = `<textarea class="q-input" id="q-answer" rows="3" placeholder="${q.placeholder || ''}" style="resize:vertical">${answers[q.key] || ''}</textarea>`;
-  } else if (q.type === 'select') {
-    const opts = q.options.map(o => `<option value="${o}" ${answers[q.key] === o ? 'selected' : ''}>${o}</option>`).join('');
-    inputHTML = `<select class="q-select" id="q-answer"><option value="">Select your state…</option>${opts}</select>`;
-  } else if (q.type === 'chips') {
-    const saved = answers[q.key] || '';
-    inputHTML = `<div class="chip-group">${q.options.map(o => `<div class="chip${saved === o ? ' selected' : ''}" onclick="selectChip(this,false)">${o}</div>`).join('')}</div>`;
-  } else if (q.type === 'chips-multi') {
-    const saved = answers[q.key] ? answers[q.key].split('||') : [];
-    inputHTML = `<div class="chip-group">${q.options.map(o => `<div class="chip${saved.includes(o) ? ' selected' : ''}" onclick="selectChip(this,true)">${o}</div>`).join('')}</div>`;
-  }
-
-  document.getElementById('question-container').innerHTML = `
+  const q=QUESTIONS[idx], total=QUESTIONS.length, pct=Math.round((idx/total)*100);
+  document.getElementById('progress-text').textContent=`Step ${idx+1} of ${total}`;
+  document.getElementById('progress-pct').textContent=pct+'%';
+  document.getElementById('progress-bar').style.width=pct+'%';
+  let inp='';
+  if(q.type==='text') inp=`<input class="q-input" id="q-answer" type="text" placeholder="${q.placeholder||''}" value="${answers[q.key]||''}">`;
+  else if(q.type==='textarea') inp=`<textarea class="q-input" id="q-answer" rows="3" placeholder="${q.placeholder||''}" style="resize:vertical">${answers[q.key]||''}</textarea>`;
+  else if(q.type==='select'){const opts=q.options.map(o=>`<option value="${o}" ${answers[q.key]===o?'selected':''}>${o}</option>`).join('');inp=`<select class="q-select" id="q-answer"><option value="">Select your state…</option>${opts}</select>`;}
+  else if(q.type==='chips'){const sv=answers[q.key]||'';inp=`<div class="chip-group">${q.options.map(o=>`<div class="chip${sv===o?' selected':''}" onclick="selectChip(this,false)">${o}</div>`).join('')}</div>`;}
+  else if(q.type==='chips-multi'){const sv=answers[q.key]?answers[q.key].split('||'):[];inp=`<div class="chip-group">${q.options.map(o=>`<div class="chip${sv.includes(o)?' selected':''}" onclick="selectChip(this,true)">${o}</div>`).join('')}</div>`;}
+  document.getElementById('question-container').innerHTML=`
     <div class="q-card">
-      <div class="q-group-label">${q.group}</div>
+      <div class="q-group">${q.group}</div>
       <div class="q-text">${q.text}</div>
-      ${q.hint ? `<div class="q-hint">${q.hint}</div>` : ''}
-      ${inputHTML}
+      ${q.hint?`<div class="q-hint">${q.hint}</div>`:''}
+      ${inp}
     </div>
     <div class="q-nav">
-      ${idx > 0 ? `<button class="btn-back" onclick="goBack()">← Back</button>` : `<div></div>`}
-      ${idx < QUESTIONS.length - 1
-        ? `<button class="btn-next" onclick="goNext()">Continue →</button>`
-        : `<button class="btn-next" onclick="goNext()" style="background:var(--gold);color:var(--navy)">Generate my list →</button>`}
+      ${idx>0?`<button class="btn-back" onclick="goBack()">← Back</button>`:`<div></div>`}
+      ${idx<QUESTIONS.length-1?`<button class="btn-next" onclick="goNext()">Continue →</button>`:`<button class="btn-next btn-generate" onclick="goNext()">Generate my list →</button>`}
     </div>`;
 }
 
-function selectChip(el, multi) {
-  if (!multi) {
-    el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
-    el.classList.add('selected');
-  } else {
-    el.classList.toggle('selected');
-  }
+function selectChip(el,multi){
+  if(!multi){el.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');}
+  else el.classList.toggle('selected');
 }
 
-function getAnswer(q) {
-  if (q.type === 'chips') {
-    const sel = document.querySelector('.chip.selected');
-    return sel ? sel.textContent : '';
-  } else if (q.type === 'chips-multi') {
-    return [...document.querySelectorAll('.chip.selected')].map(c => c.textContent).join('||');
-  } else if (q.type === 'select') {
-    return document.getElementById('q-answer')?.value || '';
-  } else {
-    return document.getElementById('q-answer')?.value?.trim() || '';
-  }
+function getAnswer(q){
+  if(q.type==='chips'){const s=document.querySelector('.chip.selected');return s?s.textContent:'';}
+  if(q.type==='chips-multi')return[...document.querySelectorAll('.chip.selected')].map(c=>c.textContent).join('||');
+  if(q.type==='select')return document.getElementById('q-answer')?.value||'';
+  return document.getElementById('q-answer')?.value?.trim()||'';
 }
 
-function goNext() {
-  const q = QUESTIONS[currentQ];
-  answers[q.key] = getAnswer(q);
-  if (currentQ < QUESTIONS.length - 1) {
-    currentQ++;
-    renderQuestion(currentQ);
-  } else {
-    generateList();
-  }
-}
+function goNext(){answers[QUESTIONS[currentQ].key]=getAnswer(QUESTIONS[currentQ]);if(currentQ<QUESTIONS.length-1){currentQ++;renderQuestion(currentQ);}else generateList();}
+function goBack(){if(currentQ>0){currentQ--;renderQuestion(currentQ);}}
 
-function goBack() {
-  if (currentQ > 0) { currentQ--; renderQuestion(currentQ); }
-}
-
-function buildPrompt() {
-  const a = answers;
-  const mv = v => v ? v.split('||').join(', ') : 'No preference';
-  return `You are a college admissions counselor. Based on the student profile below, generate a personalized college list.
+function buildPrompt(){
+  const a=answers,mv=v=>v?v.split('||').join(', '):'No preference';
+  return `You are an expert college admissions counselor. Generate a personalized college list based on this student profile.
 
 STUDENT PROFILE:
-- Student type: ${a.student_type || 'High school student'}
-- Current state: ${a.current_state || 'Not specified'}
-- GPA: ${a.gpa || 'Not provided'}
-- Test scores: ${a.test_scores || 'Test-optional'}
-- Class rank: ${a.class_rank || 'Not provided'}
-- Advanced courses: ${a.courses || 'Not provided'}
-- Extracurriculars: ${a.extracurriculars || 'Not provided'}
-- Achievements: ${a.achievements || 'None specified'}
-- Intended major/field: ${a.major || 'Undecided'}
+- Student type: ${a.student_type||'High school student'}
+- Current state: ${a.current_state||'Not specified'}
+- GPA: ${a.gpa||'Not provided'}
+- Test scores: ${a.test_scores||'Test-optional'}
+- Class rank: ${a.class_rank||'Not provided'}
+- Advanced courses: ${a.courses||'Not provided'}
+- Extracurriculars: ${a.extracurriculars||'Not provided'}
+- Achievements: ${a.achievements||'None specified'}
+- Intended major/field: ${a.major||'Undecided'}
 - School type preference: ${mv(a.school_type_pref)}
-- Number of schools requested: ${a.num_schools || '10-15 schools'}
-- Financial aid importance: ${a.financial_aid || 'Not specified'}
+- Number of schools: ${a.num_schools||'10-15 schools'}
+- Financial aid importance: ${a.financial_aid||'Not specified'}
 - Geographic preferences: ${mv(a.location)}
-- Distance from home: ${a.distance || 'No preference'}
-- Climate preference: ${a.climate || 'No preference'}
-- School size preference: ${a.school_size || 'No preference'}
-- Campus setting: ${a.setting || 'No preference'}
-- Sports scene importance: ${a.sports || 'Not specified'}
-- Greek life: ${a.greek_life || 'No preference'}
-- Campus culture priorities: ${mv(a.campus_culture)}
-- Public vs private: ${a.public_private || 'No preference'}
+- Distance from home: ${a.distance||'No preference'}
+- Climate preference: ${a.climate||'No preference'}
+- School size: ${a.school_size||'No preference'}
+- Campus setting: ${a.setting||'No preference'}
+- Sports scene: ${a.sports||'Not specified'}
+- Greek life: ${a.greek_life||'No preference'}
+- Campus culture: ${mv(a.campus_culture)}
+- Public vs private: ${a.public_private||'No preference'}
 
-INSTRUCTIONS:
-Generate a college list categorized as reach, match, or safety. Match the number of schools to the student's request (${a.num_schools || '10-15 schools'}).
-
-Return ONLY a valid JSON object, no extra text:
+Return ONLY valid JSON, no markdown, no extra text:
 {
-  "summary": "One sentence personalized summary of this student's profile",
-  "profilePills": ["GPA: X.X", "SAT/ACT: ...", "State: ...", "Major: ...", "Aid: yes/no"],
+  "summary": "One personalized sentence about this student's profile and college search",
+  "profilePills": ["GPA: X.X","SAT/ACT: ...","State: ...","Major: ...","Aid: yes/no"],
   "schools": [
     {
-      "name": "Full University Name",
+      "name": "Full Official University Name",
       "location": "City, State",
       "tier": "reach",
       "acceptanceRate": "14%",
-      "appDeadline": "Jan 1 (RD), Nov 1 (ED)",
-      "decisionRelease": "Late March (RD), Mid December (ED)",
-      "enrollment": "32,000 undergrad",
-      "why": "2-3 sentence explanation personalized to this student",
-      "tags": ["tag1", "tag2", "tag3"],
-      "aidNote": "Brief aid note or empty string"
+      "tuition": "$54,000/yr out-of-state",
+      "appDeadline": "ED: Nov 1 / RD: Jan 1",
+      "decisionRelease": "ED: Dec 15 / RD: Late March",
+      "admissionsUrl": "https://admissions.school.edu",
+      "campusSearchQuery": "University Name campus beautiful",
+      "why": "2-3 sentences specifically why this school fits this student",
+      "tags": ["tag1","tag2","tag3"],
+      "aidNote": "merit scholarship note or empty string"
     }
   ],
-  "quickAsks": ["Tell me more about [school name]", "Suggest alternatives in the Southeast", "Which schools have the best aid packages?"]
+  "quickAsks": ["Tell me more about [top school]","Which have the strongest ${a.major||'my major'} programs?","Which have the best financial aid?"]
+}
+Rules: tier must be reach/match/safety lowercase. Use real admissionsUrl. Estimate tuition for intended major (in-state if public and student is from that state). Make why field specific to this student.`;
 }
 
-Tiers must be exactly "reach", "match", or "safety" (lowercase).
-For acceptanceRate use the most recent known rate (e.g. "14%").
-For appDeadline include Early Decision/Action and Regular Decision dates where applicable.
-For decisionRelease include when students typically hear back.
-Make the why field genuinely personalized to this student.`;
-}
-
-async function generateList() {
-  document.getElementById('chat-section').style.display = 'none';
-  document.getElementById('loading-section').style.display = 'block';
-  const steps = ['step1','step2','step3','step4'];
-  let si = 0;
-  const stepInterval = setInterval(() => { si++; if (si < steps.length) document.getElementById(steps[si]).classList.add('active'); }, 4000);
-
-  try {
-    const response = await fetch('/.netlify/functions/claude-proxy', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 4000, messages: [{ role: 'user', content: buildPrompt() }] })
-    });
-
-    clearInterval(stepInterval);
-    const data = await response.json();
-    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
-
-    const text = data.content.map(i => i.text || '').join('');
-    const clean = text.replace(/```json|```/g, '').trim();
-
+async function generateList(){
+  document.getElementById('chat-section').style.display='none';
+  document.getElementById('loading-section').style.display='block';
+  let si=0;
+  const iv=setInterval(()=>{si++;if(si<4)document.getElementById('step'+(si+1)).classList.add('active');},5000);
+  try{
+    const res=await fetch('/.netlify/functions/claude-proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:5000,messages:[{role:'user',content:buildPrompt()}]})});
+    clearInterval(iv);
+    const data=await res.json();
+    if(data.error) throw new Error(data.error.message||JSON.stringify(data.error));
+    const text=data.content.map(i=>i.text||'').join('');
+    const clean=text.replace(/```json|```/g,'').trim();
     let result;
-    try { result = JSON.parse(clean); }
-    catch(e) { const m = clean.match(/\{[\s\S]*\}/); if (m) result = JSON.parse(m[0]); else throw new Error('Could not parse response. Please try again.'); }
-
-    if (!result.schools || !Array.isArray(result.schools)) throw new Error('No schools returned. Please try again.');
-    schoolsData = result.schools;
+    try{result=JSON.parse(clean);}catch(e){const m=clean.match(/\{[\s\S]*\}/);if(m)result=JSON.parse(m[0]);else throw new Error('Could not parse response. Please try again.');}
+    if(!result.schools||!Array.isArray(result.schools)) throw new Error('No schools returned. Please try again.');
+    schoolsData=result.schools;
     renderResults(result);
-  } catch (err) {
-    clearInterval(stepInterval);
-    document.getElementById('loading-section').innerHTML = `<div style="text-align:center;padding:40px"><div style="font-size:32px;margin-bottom:16px">⚠️</div><div class="loader-title">Something went wrong</div><div class="loader-sub" style="margin-bottom:24px">${err.message}</div><button class="btn-next" onclick="startOver()">Try again</button></div>`;
+  }catch(err){
+    clearInterval(iv);
+    document.getElementById('loading-section').innerHTML=`<div style="text-align:center;padding:40px"><div style="font-size:36px;margin-bottom:16px">⚠️</div><div class="loader-title">Something went wrong</div><div class="loader-sub" style="margin-bottom:24px">${err.message}</div><button class="btn-next" onclick="goHome()">Try again</button></div>`;
   }
 }
 
-function renderResults(result) {
-  document.getElementById('loading-section').style.display = 'none';
-  document.getElementById('results-section').style.display = 'block';
-  document.getElementById('results-sub').textContent = result.summary || '';
-  document.getElementById('profile-pills').innerHTML = (result.profilePills || []).map(p => `<div class="profile-pill">${p}</div>`).join('');
-
-  const tiers = ['reach','match','safety'];
-  const tierLabels = { reach: 'Reach Schools', match: 'Match Schools', safety: 'Safety Schools' };
-  let listHTML = '';
-
-  tiers.forEach(tier => {
-    const schools = result.schools.filter(s => s.tier === tier);
-    if (!schools.length) return;
-    listHTML += `<div class="tier-section">
-      <div class="tier-label">
-        <span class="tier-badge ${tier}">${tier}</span>
-        <span class="tier-count">${tierLabels[tier]} · ${schools.length} school${schools.length > 1 ? 's' : ''}</span>
-      </div>
-      ${schools.map((s, i) => {
-        const campusSearch = encodeURIComponent(s.name + ' campus');
-        const id = `school-${tier}-${i}`;
-        return `<div class="school-card" id="${id}">
-          <div class="school-campus-placeholder"><span>${s.name.split(' ').map(w=>w[0]).join('').slice(0,4)}</span></div>
-          <div class="school-body">
-            <div class="school-header">
-              <div>
-                <div class="school-name">${s.name}</div>
-                <div class="school-location">📍 ${s.location}</div>
-              </div>
-              <div class="school-actions">
-                <button class="btn-campus" onclick="window.open('https://www.google.com/search?q=${campusSearch}&tbm=isch','_blank')">📷 Campus</button>
-                <button class="btn-ask" onclick="askAboutSchool('${s.name.replace(/'/g,"\\'")}')">Ask →</button>
-                <button class="btn-remove" id="rm-${id}" onclick="removeSchool('${id}')">Remove</button>
-              </div>
-            </div>
-            <div class="school-stats">
-              <div class="school-stat"><div class="stat-val">${s.acceptanceRate || 'N/A'}</div><div class="stat-lbl">Acceptance Rate</div></div>
-              <div class="school-stat"><div class="stat-val" style="font-size:12px">${s.appDeadline || 'See website'}</div><div class="stat-lbl">App Deadline</div></div>
-              <div class="school-stat"><div class="stat-val" style="font-size:12px">${s.decisionRelease || 'See website'}</div><div class="stat-lbl">Decision Release</div></div>
-            </div>
-            <div class="school-why">${s.why}</div>
-            <div class="school-tags">
-              ${(s.tags || []).map(t => `<span class="school-tag">${t}</span>`).join('')}
-              ${s.aidNote ? `<span class="school-tag" style="background:var(--green-light);color:var(--green)">💰 ${s.aidNote}</span>` : ''}
+function renderResults(result){
+  document.getElementById('loading-section').style.display='none';
+  document.getElementById('results-section').style.display='block';
+  document.getElementById('results-sub').textContent=result.summary||'';
+  document.getElementById('profile-pills').innerHTML=(result.profilePills||[]).map(p=>`<div class="profile-pill">${p}</div>`).join('');
+  const tiers=['reach','match','safety'],tierLabels={reach:'Reach Schools',match:'Match Schools',safety:'Safety Schools'};
+  let html='';
+  tiers.forEach(tier=>{
+    const schools=result.schools.filter(s=>s.tier===tier);
+    if(!schools.length) return;
+    html+=`<div class="tier-section"><div class="tier-label"><span class="tier-badge ${tier}">${tier}</span><span class="tier-count">${tierLabels[tier]} · ${schools.length} school${schools.length>1?'s':''}</span></div>`;
+    schools.forEach((s,i)=>{
+      const id=`sc-${tier}-${i}`;
+      const campusUrl=`https://www.google.com/search?q=${encodeURIComponent(s.campusSearchQuery||s.name+' campus')}&tbm=isch`;
+      const admUrl=s.admissionsUrl||`https://www.google.com/search?q=${encodeURIComponent(s.name+' admissions')}`;
+      html+=`<div class="school-card" id="${id}">
+        <a class="school-banner-placeholder" href="${campusUrl}" target="_blank">
+          <div class="school-banner-initials">${s.name.split(' ').map(w=>w[0]).join('').slice(0,4)}</div>
+          <div class="school-banner-hint">📷 Click to view campus photos</div>
+        </a>
+        <div class="school-body">
+          <div class="school-top">
+            <div><div class="school-name">${s.name}</div><div class="school-location">📍 ${s.location}</div></div>
+            <div class="school-links">
+              <button class="btn-sm campus" onclick="window.open('${campusUrl}','_blank')">📷 Campus</button>
+              <button class="btn-sm admissions" onclick="window.open('${admUrl}','_blank')">Apply →</button>
+              <button class="btn-sm ask" onclick="askAbout('${s.name.replace(/'/g,"\\'")}')">Ask AI</button>
+              <button class="btn-sm remove" id="rm-${id}" onclick="removeSchool('${id}')">Remove</button>
             </div>
           </div>
-        </div>`;
-      }).join('')}
-    </div>`;
-  });
-
-  document.getElementById('school-list').innerHTML = listHTML;
-  document.getElementById('quick-asks').innerHTML = (result.quickAsks || []).map(q =>
-    `<button class="quick-ask-btn" onclick="setFollowup('${q.replace(/'/g,"\\'")}'">${q}</button>`).join('');
-}
-
-function removeSchool(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.toggle('removed');
-  const btn = document.getElementById('rm-' + id);
-  if (btn) btn.textContent = el.classList.contains('removed') ? 'Restore' : 'Remove';
-}
-
-function askAboutSchool(name) {
-  document.getElementById('followup-input').value = `Tell me more about ${name} — programs, campus life, and how it fits my profile.`;
-  document.getElementById('followup-input').scrollIntoView({ behavior: 'smooth' });
-  document.getElementById('followup-input').focus();
-}
-
-function setFollowup(text) {
-  document.getElementById('followup-input').value = text;
-  document.getElementById('followup-input').focus();
-}
-
-async function sendFollowup() {
-  const input = document.getElementById('followup-input');
-  const q = input.value.trim();
-  if (!q) return;
-  const responseEl = document.getElementById('followup-response');
-  const errorEl = document.getElementById('followup-error');
-  responseEl.textContent = 'Thinking…';
-  responseEl.classList.add('visible');
-  errorEl.style.display = 'none';
-
-  const schoolList = schoolsData.map(s => `${s.name} (${s.tier}, ${s.location})`).join(', ');
-  const context = `The student has this college list: ${schoolList}. Their profile: major=${answers.major}, state=${answers.current_state}, aid=${answers.financial_aid}, size pref=${answers.school_size}, location pref=${answers.location?.split('||').join(', ')}.`;
-
-  try {
-    const res = await fetch('/.netlify/functions/claude-proxy', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 1000, messages: [{ role: 'user', content: `You are a college admissions counselor. Context: ${context}\n\nStudent question: ${q}\n\nAnswer helpfully in 2-4 paragraphs. Be specific and personalized.` }] })
+          <div class="school-stats">
+            <div class="s-stat"><div class="s-stat-val">${s.acceptanceRate||'N/A'}</div><div class="s-stat-lbl">Acceptance</div></div>
+            <div class="s-stat"><div class="s-stat-val" style="font-size:12px;line-height:1.3">${s.tuition||'See site'}</div><div class="s-stat-lbl">Est. Tuition</div></div>
+            <div class="s-stat"><div class="s-stat-val" style="font-size:11px;line-height:1.3">${s.appDeadline||'See site'}</div><div class="s-stat-lbl">App Deadline</div></div>
+            <div class="s-stat"><div class="s-stat-val" style="font-size:11px;line-height:1.3">${s.decisionRelease||'See site'}</div><div class="s-stat-lbl">Decision Date</div></div>
+          </div>
+          <div class="school-why">${s.why}</div>
+          <div class="school-tags">
+            ${(s.tags||[]).map(t=>`<span class="s-tag">${t}</span>`).join('')}
+            ${s.aidNote?`<span class="s-tag" style="background:var(--safety-bg);color:var(--safety)">💰 ${s.aidNote}</span>`:''}
+          </div>
+        </div>
+      </div>`;
     });
-    const data = await res.json();
-    responseEl.textContent = data.content.map(i => i.text || '').join('');
-    input.value = '';
-  } catch (err) {
-    responseEl.classList.remove('visible');
-    errorEl.style.display = 'block';
-  }
+    html+='</div>';
+  });
+  document.getElementById('school-list').innerHTML=html;
+  document.getElementById('quick-asks').innerHTML=(result.quickAsks||[]).map(q=>`<button class="quick-ask-btn" onclick="setFollowup('${q.replace(/'/g,"\\'")}')">${q}</button>`).join('');
 }
 
-function startOver() {
-  answers = {};
-  currentQ = 0;
-  schoolsData = [];
-  document.getElementById('results-section').style.display = 'none';
-  document.getElementById('loading-section').style.display = 'none';
-  document.getElementById('chat-section').style.display = 'none';
-  document.getElementById('hero-section').style.display = 'block';
-  document.getElementById('btn-home').style.display = 'none';
-  ['step1','step2','step3','step4'].forEach((s,i) => {
-    const el = document.getElementById(s);
-    if (el) { el.classList.remove('active'); if (i === 0) el.classList.add('active'); }
-  });
+function removeSchool(id){const el=document.getElementById(id);if(!el)return;el.classList.toggle('removed');const btn=document.getElementById('rm-'+id);if(btn)btn.textContent=el.classList.contains('removed')?'Restore':'Remove';}
+function askAbout(name){document.getElementById('followup-input').value=`Tell me more about ${name} — the ${answers.major||'intended'} program, campus life, and how it fits my profile.`;document.getElementById('followup-input').scrollIntoView({behavior:'smooth'});document.getElementById('followup-input').focus();}
+function setFollowup(t){document.getElementById('followup-input').value=t;document.getElementById('followup-input').focus();}
+
+async function sendFollowup(){
+  const input=document.getElementById('followup-input'),q=input.value.trim();
+  if(!q) return;
+  const rEl=document.getElementById('followup-response'),eEl=document.getElementById('followup-error');
+  rEl.textContent='Thinking…';rEl.classList.add('visible');eEl.style.display='none';
+  const list=schoolsData.map(s=>`${s.name} (${s.tier}, ${s.location})`).join(', ');
+  const ctx=`Student's list: ${list}. Profile: major=${answers.major}, state=${answers.current_state}, aid=${answers.financial_aid}, size=${answers.school_size}, regions=${answers.location?.split('||').join(', ')}.`;
+  try{
+    const res=await fetch('/.netlify/functions/claude-proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1000,messages:[{role:'user',content:`You are a college admissions counselor. Context: ${ctx}\n\nStudent question: ${q}\n\nAnswer helpfully in 2-4 paragraphs. Be specific and personalized.`}]})});
+    const data=await res.json();
+    rEl.textContent=data.content.map(i=>i.text||'').join('');
+    input.value='';
+  }catch{rEl.classList.remove('visible');eEl.style.display='block';}
 }
 </script>
 </body>
