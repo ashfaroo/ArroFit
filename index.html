@@ -421,54 +421,39 @@ function goBack(){if(currentQ>0){currentQ--;renderQuestion(currentQ);}}
 
 function buildPrompt(){
   const a=answers,mv=v=>v?v.split('||').join(', '):'No preference';
-  return `You are an expert college admissions counselor. Generate a personalized college list based on this student profile.
+  const count = a.num_schools==='8–10 schools'?9:a.num_schools==='16–20 schools'?12:10;
+  return `College admissions counselor. Generate a college list. Return ONLY JSON, no other text.
 
-STUDENT PROFILE:
-- Student type: ${a.student_type||'High school student'}
-- Current state: ${a.current_state||'Not specified'}
-- GPA: ${a.gpa||'Not provided'}
-- Test scores: ${a.test_scores||'Test-optional'}
-- Class rank: ${a.class_rank||'Not provided'}
-- Advanced courses: ${a.courses||'Not provided'}
-- Extracurriculars: ${a.extracurriculars||'Not provided'}
-- Achievements: ${a.achievements||'None specified'}
-- Intended major/field: ${a.major||'Undecided'}
-- School type preference: ${mv(a.school_type_pref)}
-- Number of schools: ${a.num_schools||'10-15 schools'}
-- Financial aid importance: ${a.financial_aid||'Not specified'}
-- Geographic preferences: ${mv(a.location)}
-- Distance from home: ${a.distance||'No preference'}
-- Climate preference: ${a.climate||'No preference'}
-- School size: ${a.school_size||'No preference'}
-- Campus setting: ${a.setting||'No preference'}
-- Sports scene: ${a.sports||'Not specified'}
-- Greek life: ${a.greek_life||'No preference'}
-- Campus culture: ${mv(a.campus_culture)}
-- Public vs private: ${a.public_private||'No preference'}
+Student: ${a.student_type||'HS student'}, ${a.current_state||'unknown state'}
+GPA: ${a.gpa||'unknown'}, Tests: ${a.test_scores||'test-optional'}
+Major: ${a.major||'undecided'}, Aid needed: ${a.financial_aid||'no'}
+Size: ${a.school_size||'any'}, Location: ${mv(a.location)}, Climate: ${a.climate||'any'}
+Setting: ${a.setting||'any'}, Public/private: ${a.public_private||'any'}
+Activities: ${a.extracurriculars||'none listed'}
+Culture: ${mv(a.campus_culture)}, Sports: ${a.sports||'any'}, Greek: ${a.greek_life||'any'}
 
-Return ONLY valid JSON, no markdown, no extra text:
+Generate exactly ${count} schools split across reach/match/safety tiers.
+
+JSON format:
 {
-  "summary": "One personalized sentence about this student's profile and college search",
-  "profilePills": ["GPA: X.X","SAT/ACT: ...","State: ...","Major: ...","Aid: yes/no"],
-  "schools": [
-    {
-      "name": "Full Official University Name",
-      "location": "City, State",
-      "tier": "reach",
-      "acceptanceRate": "14%",
-      "tuition": "$54,000/yr out-of-state",
-      "appDeadline": "ED: Nov 1 / RD: Jan 1",
-      "decisionRelease": "ED: Dec 15 / RD: Late March",
-      "admissionsUrl": "https://admissions.school.edu",
-      "campusSearchQuery": "University Name campus beautiful",
-      "why": "2-3 sentences specifically why this school fits this student",
-      "tags": ["tag1","tag2","tag3"],
-      "aidNote": "merit scholarship note or empty string"
-    }
-  ],
-  "quickAsks": ["Tell me more about [top school]","Which have the strongest ${a.major||'my major'} programs?","Which have the best financial aid?"]
-}
-Rules: tier must be reach/match/safety lowercase. Use real admissionsUrl. Estimate tuition for intended major (in-state if public and student is from that state). Make why field specific to this student.`;
+  "summary": "one sentence about this student",
+  "profilePills": ["GPA: x","Tests: x","State: x","Major: x"],
+  "schools": [{
+    "name": "Full University Name",
+    "location": "City, ST",
+    "tier": "reach",
+    "acceptanceRate": "14%",
+    "tuition": "$52k/yr",
+    "appDeadline": "ED: Nov 1 / RD: Jan 1",
+    "decisionRelease": "Dec / Late March",
+    "admissionsUrl": "https://admissions.school.edu",
+    "campusSearchQuery": "School Name campus",
+    "why": "1-2 sentences why this fits the student",
+    "tags": ["tag1","tag2"],
+    "aidNote": ""
+  }],
+  "quickAsks": ["Tell me more about X","Best aid packages?","Alternatives in Y region?"]
+}`;
 }
 
 async function generateList(){
@@ -477,7 +462,7 @@ async function generateList(){
   let si=0;
   const iv=setInterval(()=>{si++;if(si<4)document.getElementById('step'+(si+1)).classList.add('active');},5000);
   try{
-    const res=await fetch('/.netlify/functions/claude-proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:3000,messages:[{role:'user',content:buildPrompt()}]})});
+    const res=await fetch('/.netlify/functions/claude-proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:2500,messages:[{role:'user',content:buildPrompt()}]})});
     clearInterval(iv);
     const data=await res.json();
     if(data.error) throw new Error(data.error.message||JSON.stringify(data.error));
