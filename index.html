@@ -32,12 +32,13 @@ header { position: fixed; top: 0; left: 0; right: 0; z-index: 200; height: 64px;
 .btn-start-nav:hover { background: var(--gold2); }
 
 #logo-canvas { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
-.float-logo { position: absolute; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(212,176,106,0.55); border: 1px solid rgba(212,176,106,0.28); border-radius: 6px; padding: 6px 12px; white-space: nowrap; animation: floatUp linear infinite; }
-@keyframes floatUp { 0% { transform: translateY(110%) rotate(-1deg); opacity: 0; } 8% { opacity: 1; } 92% { opacity: 1; } 100% { transform: translateY(-10%) rotate(1deg); opacity: 0; } }
+.float-logo { position: absolute; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(212,176,106,0.55); border: 1px solid rgba(212,176,106,0.28); border-radius: 6px; padding: 6px 12px; white-space: nowrap; animation: floatDown linear infinite; }
+@keyframes floatDown { 0% { transform: translateY(-10%) rotate(-1deg); opacity: 0; } 8% { opacity: 1; } 92% { opacity: 1; } 100% { transform: translateY(110%) rotate(1deg); opacity: 0; } }
 
 #hero-section { position: relative; z-index: 2; }
-.hero-main { min-height: 100vh; background: var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 32px 80px; position: relative; overflow: hidden; }
-.hero-main::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 30%, rgba(184,151,74,0.12) 0%, transparent 65%); pointer-events: none; }
+.hero-main { min-height: 100vh; background: var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 32px 80px; overflow: hidden; position: relative; overflow: hidden; }
+.hero-main::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 30%, rgba(184,151,74,0.12) 0%, transparent 65%); pointer-events: none; z-index: 0; }
+.hero-main > *:not(#logo-canvas) { position: relative; z-index: 2; }
 .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(184,151,74,0.12); border: 1px solid rgba(184,151,74,0.25); color: var(--gold2); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; padding: 6px 16px; border-radius: 20px; margin-bottom: 28px; font-weight: 500; }
 .hero-eyebrow::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gold2); animation: pulse 2s ease-in-out infinite; }
 @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
@@ -352,8 +353,8 @@ function spawnLogo(preplace) {
   const dur = 12 + Math.random() * 10;
   el.style.animationDuration = dur + 's';
   if (preplace) {
-    // Start at a random position already visible in the hero (0-90% down)
-    const startPct = Math.random() * 90;
+    // Negative delay = already mid-journey drifting down across the visible hero
+    const startPct = 8 + Math.random() * 84;
     el.style.animationDelay = '-' + (dur * startPct / 100) + 's';
   } else {
     el.style.animationDelay = '0s';
