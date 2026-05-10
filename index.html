@@ -472,7 +472,7 @@ function goBack(){if(currentQ>0){currentQ--;renderQuestion(currentQ);}}
 
 function buildPrompt(){
   const a=answers,mv=v=>v?v.split('||').join(', '):'No preference';
-  const count = a.num_schools==='8–10 schools'?9:a.num_schools==='16–20 schools'?12:10;
+  const count = 10;
   return `College admissions counselor. Generate a college list. Return ONLY JSON, no other text.
 
 Student: ${a.student_type||'HS student'}, ${a.current_state||'unknown state'}
@@ -483,7 +483,7 @@ Setting: ${a.setting||'any'}, Public/private: ${a.public_private||'any'}
 Activities: ${a.extracurriculars||'none listed'}
 Culture: ${mv(a.campus_culture)}, Sports: ${a.sports||'any'}, Greek: ${a.greek_life||'any'}
 
-Generate exactly ${count} schools split across reach/match/safety tiers.
+Generate exactly ${count} schools split roughly: 30% reach, 40% match, 30% safety. Return ONLY the JSON object below with no text before or after it, no markdown, no explanation.
 
 JSON format:
 {
@@ -513,7 +513,7 @@ async function generateList(){
   let si=0;
   const iv=setInterval(()=>{si++;if(si<4){const el=document.getElementById('step'+(si+1));if(el)el.classList.add('active');}},5000);
   try{
-    const res=await fetch('/.netlify/functions/claude-proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:2500,messages:[{role:'user',content:buildPrompt()}]})});
+    const res=await fetch('/.netlify/functions/claude-proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:4000,messages:[{role:'user',content:buildPrompt()}]})});
     clearInterval(iv);
     const data=await res.json();
     if(data.error) throw new Error(data.error.message||JSON.stringify(data.error));
