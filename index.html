@@ -718,8 +718,6 @@ async function loadList() {
   }
 }
 
-}
-
 function removeSchool(id){const el=document.getElementById(id);if(!el)return;el.classList.toggle('removed');const btn=document.getElementById('rm-'+id);if(btn)btn.textContent=el.classList.contains('removed')?'Restore':'Remove';}
 function askAbout(name){document.getElementById('followup-input').value=`Tell me more about ${name} — the ${answers.major||'intended'} program, campus life, and how it fits my profile.`;document.getElementById('followup-input').scrollIntoView({behavior:'smooth'});document.getElementById('followup-input').focus();}
 function setFollowup(t){document.getElementById('followup-input').value=t;document.getElementById('followup-input').focus();}
