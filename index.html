@@ -510,7 +510,7 @@ async function generateList(){
   document.getElementById('chat-section').style.display='none';
   document.getElementById('loading-section').style.display='block';
   let si=0;
-  const iv=setInterval(()=>{si++;if(si<4)document.getElementById('step'+(si+1)).classList.add('active');},5000);
+  const iv=setInterval(()=>{si++;if(si<4){const el=document.getElementById('step'+(si+1));if(el)el.classList.add('active');}},5000);
   try{
     const res=await fetch('/.netlify/functions/claude-proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:2500,messages:[{role:'user',content:buildPrompt()}]})});
     clearInterval(iv);
