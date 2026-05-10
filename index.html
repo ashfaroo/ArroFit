@@ -1056,11 +1056,26 @@ async function generateList() {
 
     clearInterval(stepInterval);
     const data = await response.json();
-    const text = data.content.map(i => i.text || '').join('');
-    const clean = text.replace(/```json|```/g, '').trim();
-    const result = JSON.parse(clean);
-    schoolsData = result.schools;
 
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+
+    const text = data.content.map(i => i.text || "").join("");
+    const clean = text.replace(/```json|```/g, "").trim();
+
+    let result;
+    try {
+      result = JSON.parse(clean);
+    } catch(e) {
+      const match = clean.match(/\{[\s\S]*\}/);
+      if (match) result = JSON.parse(match[0]);
+      else throw new Error("Could not parse response. Please try again.");
+    }
+
+    if (!result.schools || !Array.isArray(result.schools)) {
+      throw new Error("No schools returned. Please try again.");
+    }
+
+    schoolsData = result.schools;
     renderResults(result);
   } catch (err) {
     clearInterval(stepInterval);
