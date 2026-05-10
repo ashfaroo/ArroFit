@@ -484,8 +484,21 @@ async function generateList(){
     const text=data.content.map(i=>i.text||'').join('');
     const clean=text.replace(/```json|```/g,'').trim();
     let result;
-    try{result=JSON.parse(clean);}catch(e){const m=clean.match(/\{[\s\S]*\}/);if(m)result=JSON.parse(m[0]);else throw new Error('Could not parse response. Please try again.');}
-    if(!result.schools||!Array.isArray(result.schools)) throw new Error('No schools returned. Please try again.');
+    try { result = JSON.parse(clean); } catch(e) {
+      // Try to extract just the JSON object
+      const m = clean.match(/\{[\s\S]*\}/);
+      if (m) {
+        try { result = JSON.parse(m[0]); } catch(e2) {
+          throw new Error('Could not parse AI response. Please try again.');
+        }
+      } else {
+        throw new Error('Could not parse AI response. Please try again.');
+      }
+    }
+    if (!result || typeof result !== 'object') throw new Error('Invalid response format. Please try again.');
+    if (!result.schools) throw new Error('No schools found in response. Please try again.');
+    if (!Array.isArray(result.schools)) throw new Error('Schools data is malformed. Please try again.');
+    if (result.schools.length === 0) throw new Error('Empty school list returned. Please try again.');
     schoolsData=result.schools;
     renderResults(result);
   }catch(err){
