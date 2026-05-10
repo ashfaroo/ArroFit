@@ -31,14 +31,10 @@ header { position: fixed; top: 0; left: 0; right: 0; z-index: 200; height: 64px;
 .btn-start-nav { background: var(--gold); border: none; border-radius: 6px; padding: 8px 20px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: var(--ink); cursor: pointer; transition: all 0.2s; }
 .btn-start-nav:hover { background: var(--gold2); }
 
-#logo-canvas { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
-.float-logo { position: absolute; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(212,176,106,0.55); border: 1px solid rgba(212,176,106,0.28); border-radius: 6px; padding: 6px 12px; white-space: nowrap; animation: floatDown linear infinite; }
-@keyframes floatDown { 0% { transform: translateY(-10%) rotate(-1deg); opacity: 0; } 8% { opacity: 1; } 92% { opacity: 1; } 100% { transform: translateY(110%) rotate(1deg); opacity: 0; } }
 
 #hero-section { position: relative; z-index: 2; }
 .hero-main { min-height: 100vh; background: var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 32px 80px; overflow: hidden; position: relative; overflow: hidden; }
 .hero-main::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 30%, rgba(184,151,74,0.12) 0%, transparent 65%); pointer-events: none; z-index: 0; }
-.hero-main > *:not(#logo-canvas) { position: relative; z-index: 2; }
 .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(184,151,74,0.12); border: 1px solid rgba(184,151,74,0.25); color: var(--gold2); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; padding: 6px 16px; border-radius: 20px; margin-bottom: 28px; font-weight: 500; }
 .hero-eyebrow::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gold2); animation: pulse 2s ease-in-out infinite; }
 @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
@@ -229,7 +225,6 @@ main { max-width: 820px; margin: 0 auto; padding: 100px 24px 80px; position: rel
 
 <div id="hero-section">
   <div class="hero-main">
-    <div id="logo-canvas"></div>
     <div class="hero-eyebrow">AI-Powered College Advising</div>
     <h1 class="hero-h1">Your perfect college list,<br><em>built around you</em></h1>
     <p class="hero-sub">Answer a few questions and our AI builds a personalized, tiered college list — complete with stats, deadlines, and fit explanations.</p>
@@ -340,32 +335,7 @@ main { max-width: 820px; margin: 0 auto; padding: 100px 24px 80px; position: rel
 </main>
 
 <script>
-const SCHOOL_NAMES = ['MIT','Harvard','Stanford','Yale','Princeton','Columbia','Penn','Dartmouth','Brown','Cornell','Duke','Northwestern','Vanderbilt','Rice','Emory','Georgetown','Tufts','NYU','USC','UCLA','Michigan','UNC','UVA','Georgia Tech','Purdue','Ohio State','Texas A&M','Indiana','Wisconsin','Boston University','Northeastern','Tulane','Wake Forest','Pomona','Harvey Mudd','Swarthmore','Williams','Amherst','Wesleyan','Colgate','Middlebury','Bowdoin','Colby','Hamilton','Oberlin','Kenyon','Grinnell','Davidson','Fordham','Lehigh'];
 
-function spawnLogo(preplace) {
-  const hero = document.getElementById('hero-section');
-  const canvas = document.getElementById('logo-canvas');
-  if (!canvas || !hero || hero.style.display === 'none') return;
-  const el = document.createElement('div');
-  el.className = 'float-logo';
-  el.textContent = SCHOOL_NAMES[Math.floor(Math.random() * SCHOOL_NAMES.length)];
-  el.style.left = (2 + Math.random() * 88) + '%';
-  const dur = 12 + Math.random() * 10;
-  el.style.animationDuration = dur + 's';
-  if (preplace) {
-    // Negative delay = already mid-journey drifting down across the visible hero
-    const startPct = 8 + Math.random() * 84;
-    el.style.animationDelay = '-' + (dur * startPct / 100) + 's';
-  } else {
-    el.style.animationDelay = '0s';
-  }
-  canvas.appendChild(el);
-  setTimeout(() => el.remove(), dur * 1000);
-}
-// Pre-place logos already visible across the hero on load
-for (let i = 0; i < 22; i++) setTimeout(() => spawnLogo(true), i * 80);
-// Then keep spawning new ones from the bottom continuously
-setInterval(() => spawnLogo(false), 1000);
 
 const QUESTIONS = [
   {group:"Getting Started",key:"student_type",text:"Are you a high school student or a college student looking to transfer?",hint:"This helps us find the right type of programs for you.",type:"chips",options:["High school student","Community college student","4-year transfer student"]},
