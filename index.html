@@ -929,24 +929,20 @@ function hidePolicy() {
 async function loadWikipediaImage(school, id) {
   if (!school.wikipediaTitle) return;
   try {
-    const title = encodeURIComponent(school.wikipediaTitle);
-    const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${title}&prop=pageimages&format=json&pithumbsize=800&origin=*`;
-    const res = await fetch(url);
+    const res = await fetch('/.netlify/functions/wiki-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: school.wikipediaTitle })
+    });
     const data = await res.json();
-    const pages = data.query.pages;
-    const page = pages[Object.keys(pages)[0]];
-    if (!page || !page.thumbnail) return;
-    const imgUrl = page.thumbnail.source;
-    // Find the banner placeholder and replace with actual image
-    const banner = document.querySelector(`#${id} .school-banner-placeholder`);
+    if (!data.found || !data.url) return;
+    const banner = document.querySelector('#' + id + ' .school-banner-placeholder');
     if (!banner) return;
     const img = document.createElement('img');
-    img.src = imgUrl;
+    img.src = data.url;
     img.style.cssText = 'width:100%;height:180px;object-fit:cover;display:block;';
     img.alt = school.name + ' campus';
-    img.onload = () => {
-      banner.parentNode.replaceChild(img, banner);
-    };
+    img.onload = () => { banner.parentNode.replaceChild(img, banner); };
     img.onerror = () => { /* keep placeholder */ };
   } catch(e) { /* silently fail */ }
 }
