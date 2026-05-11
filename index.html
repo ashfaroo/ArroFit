@@ -87,7 +87,7 @@ header { position: fixed; top: 0; left: 0; right: 0; z-index: 200; height: 64px;
 
 footer { background: #080808; padding: 0; border-top: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 2; }
 .footer-wrap { max-width: 1200px; margin: 0 auto; padding: 60px 60px 0; }
-.footer-inner { display: grid; grid-template-columns: 3fr 1fr 1fr; gap: 48px; margin-bottom: 40px; width: 100%; align-items: start; }
+.footer-inner { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 64px; margin-bottom: 40px; width: 100%; align-items: start; }
 .footer-logo { font-family: 'Playfair Display', serif; font-size: 20px; color: rgba(255,255,255,0.6); margin-bottom: 8px; }
 .footer-logo em { color: var(--gold); font-style: italic; }
 .footer-tagline { font-size: 12px; color: rgba(255,255,255,0.25); line-height: 1.6; max-width: 200px; }
@@ -593,6 +593,7 @@ function goHome() {
 
 function startChat() {
   document.getElementById('hero-section').style.display='none';
+  document.querySelector('main').style.display='block';
   document.getElementById('chat-section').style.display='block';
   document.getElementById('btn-home').style.display='block';
   window.scrollTo({top:0});
@@ -889,6 +890,7 @@ async function loadList() {
     answers = data.answers || {};
     schoolsData = data.result.schools || [];
     document.getElementById('hero-section').style.display = 'none';
+    document.querySelector('main').style.display = 'block';
     document.getElementById('btn-home').style.display = 'block';
     document.getElementById('results-section').style.display = 'block';
     window.scrollTo({ top: 0 });
