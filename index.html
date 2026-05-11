@@ -241,6 +241,18 @@ main { max-width: 820px; margin: 0 auto; padding: 100px 24px 80px; position: rel
 .load-error { font-size: 13px; color: var(--reach); margin-top: 10px; display: none; }
 .load-loading { font-size: 13px; color: #888; margin-top: 10px; display: none; }
 
+@media(min-width:1200px){
+  .how-section,.features-section,.mission-section,.cta-section { padding-left: calc((100vw - 960px) / 2); padding-right: calc((100vw - 960px) / 2); }
+  .hero-main { padding-left: 40px; padding-right: 40px; }
+  .stats-strip { padding-left: calc((100vw - 960px) / 2); padding-right: calc((100vw - 960px) / 2); }
+  footer { padding-left: calc((100vw - 960px) / 2); padding-right: calc((100vw - 960px) / 2); }
+}
+
+.input-wrap { position: relative; }
+.input-error { font-size: 12px; color: var(--reach); margin-top: 6px; display: none; }
+.input-error.visible { display: block; }
+.q-input.invalid { border-color: var(--reach); background: var(--reach-bg); }
+
 @media(max-width:700px){
   .steps-grid,.features-grid{grid-template-columns:1fr}
   .stats-strip{flex-wrap:wrap;gap:24px}
@@ -579,8 +591,8 @@ function renderQuestion(idx) {
   document.getElementById('progress-pct').textContent=pct+'%';
   document.getElementById('progress-bar').style.width=pct+'%';
   let inp='';
-  if(q.type==='text') inp=`<input class="q-input" id="q-answer" type="text" placeholder="${q.placeholder||''}" value="${answers[q.key]||''}">`;
-  else if(q.type==='textarea') inp=`<textarea class="q-input" id="q-answer" rows="3" placeholder="${q.placeholder||''}" style="resize:vertical">${answers[q.key]||''}</textarea>`;
+  if(q.type==='text') inp=`<div class="input-wrap"><input class="q-input" id="q-answer" type="text" placeholder="${q.placeholder||''}" value="${answers[q.key]||''}" oninput="clearInputError()"><div class="input-error" id="input-error"></div></div>`;
+  else if(q.type==='textarea') inp=`<div class="input-wrap"><textarea class="q-input" id="q-answer" rows="3" placeholder="${q.placeholder||''}" style="resize:vertical" oninput="clearInputError()">${answers[q.key]||''}</textarea><div class="input-error" id="input-error"></div></div>`;
   else if(q.type==='select'){const opts=q.options.map(o=>`<option value="${o}" ${answers[q.key]===o?'selected':''}>${o}</option>`).join('');inp=`<select class="q-select" id="q-answer"><option value="">Select your state…</option>${opts}</select>`;}
   else if(q.type==='chips'){const sv=answers[q.key]||'';inp=`<div class="chip-group">${q.options.map(o=>`<div class="chip${sv===o?' selected':''}" onclick="selectChip(this,false)">${o}</div>`).join('')}</div>`;}
   else if(q.type==='chips-multi'){const sv=answers[q.key]?answers[q.key].split('||'):[];inp=`<div class="chip-group">${q.options.map(o=>`<div class="chip${sv.includes(o)?' selected':''}" onclick="selectChip(this,true)">${o}</div>`).join('')}</div>`;}
@@ -609,7 +621,40 @@ function getAnswer(q){
   return document.getElementById('q-answer')?.value?.trim()||'';
 }
 
-function goNext(){answers[QUESTIONS[currentQ].key]=getAnswer(QUESTIONS[currentQ]);if(currentQ<QUESTIONS.length-1){currentQ++;renderQuestion(currentQ);}else generateList();}
+function clearInputError() {
+  const el = document.getElementById('input-error');
+  const inp = document.getElementById('q-answer');
+  if (el) el.classList.remove('visible');
+  if (inp) inp.classList.remove('invalid');
+}
+
+function validateAnswer(q, val) {
+  // Check for special characters that break JSON (< > & etc)
+  const forbidden = /[<>&"\{}]/;
+  if (forbidden.test(val)) return 'Please avoid special characters like < > & \ { }';
+  // For text fields, check minimum meaningful input
+  if ((q.type === 'text' || q.type === 'textarea') && val.length > 500) return 'Please keep your answer under 500 characters.';
+  return null;
+}
+
+function showInputError(msg) {
+  const el = document.getElementById('input-error');
+  const inp = document.getElementById('q-answer');
+  if (el) { el.textContent = msg; el.classList.add('visible'); }
+  if (inp) inp.classList.add('invalid');
+}
+
+function goNext(){
+  const q = QUESTIONS[currentQ];
+  const val = getAnswer(q);
+  // Validate text inputs
+  if (q.type === 'text' || q.type === 'textarea') {
+    const err = validateAnswer(q, val);
+    if (err) { showInputError(err); return; }
+  }
+  answers[q.key] = val;
+  if(currentQ<QUESTIONS.length-1){currentQ++;renderQuestion(currentQ);}else generateList();
+}
 function goBack(){if(currentQ>0){currentQ--;renderQuestion(currentQ);}}
 
 function buildPrompt(){
