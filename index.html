@@ -691,8 +691,6 @@ Student profile: ${a.student_type||'HS student'} from ${a.current_state||'unknow
 
 Generate exactly ${count} US colleges: 3 reach, 4 match, 3 safety. Each must have accurate real data.
 
-For wikipediaTitle use the exact Wikipedia article title for the school (e.g. "University of Michigan", "Massachusetts Institute of Technology"). This must match the exact Wikipedia page name.
-
 Respond with this exact JSON structure:
 {"summary":"one sentence","profilePills":["GPA: x","Tests: x","State: x","Major: x"],"schools":[{"name":"Full University Name","location":"City, ST","tier":"reach","acceptanceRate":"14%","tuition":"$52k/yr","appDeadline":"ED: Nov 1 / RD: Jan 1","decisionRelease":"Dec / Late March","admissionsUrl":"https://admissions.university.edu","campusSearchQuery":"University Name campus","why":"1-2 sentences specific to this student","tags":["tag1","tag2"],"aidNote":""}],"quickAsks":["Question 1?","Question 2?","Question 3?"]}`;
 }
@@ -934,7 +932,7 @@ async function loadWikipediaImage(school, id) {
     const res = await fetch('/.netlify/functions/wiki-image', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: school.wikipediaTitle, name: school.name })
+      body: JSON.stringify({ name: school.name })
     });
     if (!res.ok) return;
     const contentType = res.headers.get('content-type') || '';
