@@ -927,19 +927,24 @@ function hidePolicy() {
 }
 
 async function loadWikipediaImage(school, id) {
-  if (!school.wikipediaTitle) return;
+  if (!school.wikipediaTitle && !school.name) return;
   try {
+    // Use the function as a direct image src - it proxies the image bytes
+    const params = new URLSearchParams({ title: school.wikipediaTitle || '', name: school.name || '' });
     const res = await fetch('/.netlify/functions/wiki-image', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title: school.wikipediaTitle, name: school.name })
     });
-    const data = await res.json();
-    if (!data.found || !data.url) return;
+    if (!res.ok) return;
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.startsWith('image/')) return;
+    const blob = await res.blob();
+    const objectUrl = URL.createObjectURL(blob);
     const banner = document.querySelector('#' + id + ' .school-banner-placeholder');
     if (!banner) return;
     const img = document.createElement('img');
-    img.src = data.url;
+    img.src = objectUrl;
     img.style.cssText = 'width:100%;height:180px;object-fit:cover;display:block;';
     img.alt = school.name + ' campus';
     img.onload = () => { banner.parentNode.replaceChild(img, banner); };
