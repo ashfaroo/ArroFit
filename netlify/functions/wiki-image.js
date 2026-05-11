@@ -10,42 +10,53 @@ exports.handler = async function(event) {
   const { title, name } = body;
   if (!title && !name) return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing title" }) };
 
-  const titles = [title, name].filter(Boolean);
+  const fetchImage = async (t) => {
+    const apiUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(t)}&prop=pageimages&format=json&pithumbsize=900&pilicense=any`;
+    const res = await fetch(apiUrl, {
+      headers: { "User-Agent": "ArrofitAI/1.0 (https://arrofitai.com; hello@arrofitai.com)" }
+    });
+    const data = await res.json();
+    const pages = data.query.pages;
+    const page = pages[Object.keys(pages)[0]];
+    if (page && page.thumbnail) return page.thumbnail;
+    return null;
+  };
+
+  // Try campus-specific search first, then fall back to main article
+  const titles = [
+    title ? title + ' campus' : null,
+    name ? name + ' campus' : null,
+    title,
+    name,
+  ].filter(Boolean);
 
   for (const t of titles) {
     try {
-      const apiUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(t)}&prop=pageimages&format=json&pithumbsize=900`;
-      const res = await fetch(apiUrl, {
+      const thumb = await fetchImage(t);
+      if (!thumb || !thumb.source) continue;
+      
+      // Only accept landscape images (wider than tall) — filters out logos/portraits
+      const isLandscape = thumb.width > thumb.height;
+      const isLargeEnough = thumb.width >= 400;
+      
+      if (!isLandscape || !isLargeEnough) continue;
+
+      // Proxy the image through our function
+      const imgRes = await fetch(thumb.source, {
         headers: {
           "User-Agent": "ArrofitAI/1.0 (https://arrofitai.com; hello@arrofitai.com)",
-          "Accept": "application/json"
+          "Referer": "https://en.wikipedia.org"
         }
       });
-      const data = await res.json();
-      const pages = data.query.pages;
-      const page = pages[Object.keys(pages)[0]];
-      if (page && page.thumbnail && page.thumbnail.source && page.thumbnail.width >= 200) {
-        // Proxy the image through our function to avoid browser CORS/hotlink issues
-        const imgRes = await fetch(page.thumbnail.source, {
-          headers: {
-            "User-Agent": "ArrofitAI/1.0 (https://arrofitai.com; hello@arrofitai.com)",
-            "Referer": "https://en.wikipedia.org"
-          }
-        });
-        if (imgRes.ok) {
-          const imgBuffer = await imgRes.arrayBuffer();
-          const contentType = imgRes.headers.get("content-type") || "image/jpeg";
-          return {
-            statusCode: 200,
-            headers: {
-              "Content-Type": contentType,
-              "Cache-Control": "public, max-age=86400"
-            },
-            body: Buffer.from(imgBuffer).toString("base64"),
-            isBase64Encoded: true
-          };
-        }
-      }
+      if (!imgRes.ok) continue;
+      const imgBuffer = await imgRes.arrayBuffer();
+      const contentType = imgRes.headers.get("content-type") || "image/jpeg";
+      return {
+        statusCode: 200,
+        headers: { "Content-Type": contentType, "Cache-Control": "public, max-age=86400" },
+        body: Buffer.from(imgBuffer).toString("base64"),
+        isBase64Encoded: true
+      };
     } catch(e) { continue; }
   }
 
