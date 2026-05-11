@@ -87,7 +87,7 @@ header { position: fixed; top: 0; left: 0; right: 0; z-index: 200; height: 64px;
 
 footer { background: #080808; padding: 0; border-top: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 2; }
 .footer-wrap { max-width: 1200px; margin: 0 auto; padding: 60px 60px 0; }
-.footer-inner { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 32px; margin-bottom: 40px; width: 100%; }
+.footer-inner { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 48px; margin-bottom: 40px; width: 100%; align-items: start; }
 .footer-logo { font-family: 'Playfair Display', serif; font-size: 20px; color: rgba(255,255,255,0.6); margin-bottom: 8px; }
 .footer-logo em { color: var(--gold); font-style: italic; }
 .footer-tagline { font-size: 12px; color: rgba(255,255,255,0.25); line-height: 1.6; max-width: 200px; }
@@ -108,7 +108,7 @@ footer { background: #080808; padding: 0; border-top: 1px solid rgba(255,255,255
 .policy-back { position: fixed; top: 20px; left: 40px; background: var(--ink); color: white; border: none; border-radius: 8px; padding: 9px 18px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; z-index: 1001; transition: background 0.2s; }
 .policy-back:hover { background: var(--ink3); }
 
-main { max-width: 820px; margin: 0 auto; padding: 100px 24px 80px; position: relative; z-index: 10; }
+main { max-width: 820px; margin: 0 auto; padding: 100px 24px 80px; position: relative; z-index: 10; display: none; }
 #chat-section { display: none; }
 #results-section { display: none; }
 
@@ -584,6 +584,7 @@ let answers={}, currentQ=0, schoolsData=[];
 function goHome() {
   answers={}; currentQ=0; schoolsData=[];
   ['results-section','loading-section','chat-section'].forEach(id=>document.getElementById(id).style.display='none');
+  document.querySelector('main').style.display='none';
   document.getElementById('hero-section').style.display='block';
   document.getElementById('btn-home').style.display='none';
   ['step1','step2','step3','step4'].forEach((s,i)=>{const el=document.getElementById(s);if(el){el.classList.remove('active');if(i===0)el.classList.add('active');}});
