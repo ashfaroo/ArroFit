@@ -629,11 +629,9 @@ function clearInputError() {
 }
 
 function validateAnswer(q, val) {
-  // Check for special characters that break JSON (< > & etc)
-  const forbidden = /[<>&"\{}]/;
-  if (forbidden.test(val)) return 'Please avoid special characters like < > & \ { }';
-  // For text fields, check minimum meaningful input
-  if ((q.type === 'text' || q.type === 'textarea') && val.length > 500) return 'Please keep your answer under 500 characters.';
+  const forbidden = /[<>&{}]/;
+  if (forbidden.test(val)) return 'Please avoid special characters like < > & { }';
+  if (val.length > 500) return 'Please keep your answer under 500 characters.';
   return null;
 }
 
@@ -657,8 +655,20 @@ function goNext(){
 }
 function goBack(){if(currentQ>0){currentQ--;renderQuestion(currentQ);}}
 
+function sanitize(str) {
+  if (!str) return str;
+  return str
+    .replace(/\\/g, '')
+    .replace(/"/g, "'")
+    .replace(/`/g, "'")
+    .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+    .trim();
+}
+
 function buildPrompt(){
   const a=answers,mv=v=>v?v.split('||').join(', '):'No preference';
+  // Sanitize all text answers before sending to Claude
+  Object.keys(a).forEach(k=>{ if(typeof a[k]==='string') a[k]=sanitize(a[k]); });
   const count = 10;
   return `College admissions counselor. Generate a college list. Return ONLY JSON, no other text.
 
