@@ -4,19 +4,26 @@ exports.handler = async function(event) {
   const apiKey = process.env.GOOGLE_PLACES_API_KEY;
   if (!apiKey) return { statusCode: 500, headers, body: JSON.stringify({ error: "Missing GOOGLE_PLACES_API_KEY" }) };
 
-  // GET request = test mode, returns debug info
+  // GET request = test mode
   if (event.httpMethod === 'GET') {
     try {
-      const testUrl = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=Harvard+University&inputtype=textquery&fields=place_id,photos,name&key=${apiKey}`;
-      const res = await fetch(testUrl);
-      const data = await res.json();
-      return { statusCode: 200, headers, body: JSON.stringify({ 
+      const testRes = await fetch('https://places.googleapis.com/v1/places:searchText', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': apiKey,
+          'X-Goog-FieldMask': 'places.displayName,places.photos'
+        },
+        body: JSON.stringify({ textQuery: 'Harvard University campus' })
+      });
+      const data = await testRes.json();
+      return { statusCode: 200, headers, body: JSON.stringify({
         apiKeyPresent: true,
-        apiKeyPrefix: apiKey.slice(0,8) + '...',
-        status: data.status,
-        error_message: data.error_message,
-        candidates: data.candidates?.length,
-        hasPhotos: data.candidates?.[0]?.photos?.length > 0
+        httpStatus: testRes.status,
+        error: data.error,
+        placesFound: data.places?.length,
+        hasPhotos: data.places?.[0]?.photos?.length > 0,
+        photoCount: data.places?.[0]?.photos?.length
       })};
     } catch(e) {
       return { statusCode: 500, headers, body: JSON.stringify({ error: e.message }) };
@@ -35,21 +42,25 @@ exports.handler = async function(event) {
   if (!name) return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing name" }) };
 
   try {
-    const searchUrl = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(name + ' university')}&inputtype=textquery&fields=place_id,photos,name&key=${apiKey}`;
-    const searchRes = await fetch(searchUrl);
+    // Step 1: Search using Places API (New)
+    const searchRes = await fetch('https://places.googleapis.com/v1/places:searchText', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': apiKey,
+        'X-Goog-FieldMask': 'places.displayName,places.photos'
+      },
+      body: JSON.stringify({ textQuery: name + ' university campus' })
+    });
     const searchData = await searchRes.json();
 
-    if (searchData.status !== 'OK' || !searchData.candidates?.length) {
-      return { statusCode: 200, headers, body: JSON.stringify({ found: false, status: searchData.status }) };
+    if (!searchData.places?.length || !searchData.places[0].photos?.length) {
+      return { statusCode: 200, headers, body: JSON.stringify({ found: false, debug: JSON.stringify(searchData).slice(0,200) }) };
     }
 
-    const candidate = searchData.candidates[0];
-    if (!candidate.photos?.length) {
-      return { statusCode: 200, headers, body: JSON.stringify({ found: false, reason: 'no photos' }) };
-    }
-
-    const photoRef = candidate.photos[0].photo_reference;
-    const photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${photoRef}&key=${apiKey}`;
+    // Step 2: Fetch the photo
+    const photoName = searchData.places[0].photos[0].name;
+    const photoUrl = `https://places.googleapis.com/v1/${photoName}/media?maxWidthPx=800&key=${apiKey}`;
     const imgRes = await fetch(photoUrl);
 
     if (!imgRes.ok) {
