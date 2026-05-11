@@ -932,7 +932,7 @@ async function loadWikipediaImage(school, id) {
     const res = await fetch('/.netlify/functions/wiki-image', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: school.wikipediaTitle })
+      body: JSON.stringify({ title: school.wikipediaTitle, name: school.name })
     });
     const data = await res.json();
     if (!data.found || !data.url) return;
