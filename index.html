@@ -670,38 +670,14 @@ function buildPrompt(){
   // Sanitize all text answers before sending to Claude
   Object.keys(a).forEach(k=>{ if(typeof a[k]==='string') a[k]=sanitize(a[k]); });
   const count = 10;
-  return `College admissions counselor. Generate a college list. Return ONLY JSON, no other text.
+  return `You are a college admissions counselor. Return ONLY a valid JSON object. No markdown, no explanation, no text outside the JSON.
 
-Student: ${a.student_type||'HS student'}, ${a.current_state||'unknown state'}
-GPA: ${a.gpa||'unknown'}, Tests: ${a.test_scores||'test-optional'}
-Major: ${a.major||'undecided'}, Aid needed: ${a.financial_aid||'no'}
-Size: ${a.school_size||'any'}, Location: ${mv(a.location)}, Climate: ${a.climate||'any'}
-Setting: ${a.setting||'any'}, Public/private: ${a.public_private||'any'}
-Activities: ${a.extracurriculars||'none listed'}
-Culture: ${mv(a.campus_culture)}, Sports: ${a.sports||'any'}, Greek: ${a.greek_life||'any'}
+Student profile: ${a.student_type||'HS student'} from ${a.current_state||'unknown state'}. GPA: ${a.gpa||'unknown'}. Tests: ${a.test_scores||'test-optional'}. Major: ${a.major||'undecided'}. Aid: ${a.financial_aid||'no'}. Size: ${a.school_size||'any'}. Location: ${mv(a.location)}. Climate: ${a.climate||'any'}. Setting: ${a.setting||'any'}. Public/private: ${a.public_private||'any'}. Activities: ${a.extracurriculars||'none'}. Culture: ${mv(a.campus_culture)}. Sports: ${a.sports||'any'}. Greek: ${a.greek_life||'any'}.
 
-Generate exactly ${count} schools split roughly: 30% reach, 40% match, 30% safety. Return ONLY the JSON object below with no text before or after it, no markdown, no explanation.
+Generate exactly ${count} US colleges: 3 reach, 4 match, 3 safety. Each must have accurate real data.
 
-JSON format:
-{
-  "summary": "one sentence about this student",
-  "profilePills": ["GPA: x","Tests: x","State: x","Major: x"],
-  "schools": [{
-    "name": "Full University Name",
-    "location": "City, ST",
-    "tier": "reach",
-    "acceptanceRate": "14%",
-    "tuition": "$52k/yr",
-    "appDeadline": "ED: Nov 1 / RD: Jan 1",
-    "decisionRelease": "Dec / Late March",
-    "admissionsUrl": "https://admissions.school.edu",
-    "campusSearchQuery": "School Name campus",
-    "why": "1-2 sentences why this fits the student",
-    "tags": ["tag1","tag2"],
-    "aidNote": ""
-  }],
-  "quickAsks": ["Tell me more about X","Best aid packages?","Alternatives in Y region?"]
-}`;
+Respond with this exact JSON structure:
+{"summary":"one sentence","profilePills":["GPA: x","Tests: x","State: x","Major: x"],"schools":[{"name":"Full University Name","location":"City, ST","tier":"reach","acceptanceRate":"14%","tuition":"$52k/yr","appDeadline":"ED: Nov 1 / RD: Jan 1","decisionRelease":"Dec / Late March","admissionsUrl":"https://admissions.university.edu","campusSearchQuery":"University Name campus","why":"1-2 sentences specific to this student","tags":["tag1","tag2"],"aidNote":""}],"quickAsks":["Question 1?","Question 2?","Question 3?"]}`;
 }
 
 async function generateList(){
@@ -710,7 +686,7 @@ async function generateList(){
   let si=0;
   const iv=setInterval(()=>{si++;if(si<4){const el=document.getElementById('step'+(si+1));if(el)el.classList.add('active');}},5000);
   try{
-    const res=await fetch('/.netlify/functions/claude-proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:4000,messages:[{role:'user',content:buildPrompt()}]})});
+    const res=await fetch('/.netlify/functions/claude-proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:3000,messages:[{role:'user',content:buildPrompt()}]})});
     clearInterval(iv);
     const data=await res.json();
     if(data.error) throw new Error(data.error.message||JSON.stringify(data.error));
