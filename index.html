@@ -282,8 +282,9 @@ main { max-width: 820px; margin: 0 auto; padding: 100px 24px 80px; position: rel
 <header>
   <div class="logo" onclick="hidePolicy();goHome()">Arro<em>fit</em></div>
   <div class="header-right">
-    <button class="nav-link" onclick="document.getElementById('how-section').scrollIntoView({behavior:'smooth'})">How it works</button>
-    <button class="nav-link" onclick="document.getElementById('mission-section').scrollIntoView({behavior:'smooth'})">Our mission</button>
+    <button class="nav-link" onclick="goHome();setTimeout(()=>document.getElementById('how-section').scrollIntoView({behavior:'smooth'}),100)">How it works</button>
+    <button class="nav-link" onclick="goHome();setTimeout(()=>document.getElementById('mission-section').scrollIntoView({behavior:'smooth'}),100)">Our mission</button>
+    <button class="nav-link" onclick="goHome();setTimeout(()=>document.getElementById('load-section').scrollIntoView({behavior:'smooth'}),100)">Returning student</button>
     <button class="btn-home" id="btn-home" onclick="goHome()">← Home</button>
     <button class="btn-start-nav" onclick="startChat()">Get started</button>
   </div>
@@ -353,7 +354,7 @@ main { max-width: 820px; margin: 0 auto; padding: 100px 24px 80px; position: rel
     </div>
   </div>
 
-  <div style="background:var(--white);padding:60px 40px 60px;position:relative;z-index:2;display:flex;justify-content:center;">
+  <div id="load-section" style="background:var(--white);padding:60px 40px 60px;position:relative;z-index:2;display:flex;justify-content:center;">
     <div class="load-section" style="width:100%;">
       <h3>Returning student?</h3>
       <p>Enter your save code to pick up right where you left off.</p>
